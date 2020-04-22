@@ -83,7 +83,7 @@ int CoolButton::update() {
     case T_UNPRESS:
       if (button_pressed) {
         if (flag == 2) {
-          state - LONG;
+          state = LONG;
         } else if (flag == 3) {
           state = DOUBLE;
         }
