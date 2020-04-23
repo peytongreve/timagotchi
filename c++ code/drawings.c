@@ -1,59 +1,10 @@
-#ifndef Menu_h
-#define Menu_h
-#include <SPI.h>
-#include <TFT_eSPI.h>
-#include <Adafruit_ST7735.h>
-#include <Adafruit_GFX.h>
+#include <pgmspace.h>
+//#define imageWidth 482
+//#define imageHeight 726
 
-#define BLACK 0x0000
-#define BLUE 0x0C3A
-#define RED 0xF800
 
-#define HOME 0
-#define GRIND 1
-#define EAT 2
-#define PLAY 3
-#define RESUME 4
-
-class VerticalMenu
-{
-  private:
-  uint8_t state;
-  uint32_t num_items;
-  
-  TFT_eSPI tft;
-
-//  const unsigned char beaver [500] PROGMEM;
-//  const unsigned char energy_bar[500] PROGMEM;
-//  const unsigned char empty_bar[500] PROGMEM;
-//  const unsigned char fifth_bar[500] PROGMEM;
-//  const unsigned char two_fifth_bar[500] PROGMEM;
-//  const unsigned char three_fifth_bar[500] PROGMEM;
-//  const unsigned char four_fifth_bar[500] PROGMEM;
-//  const unsigned char full_bar[500] PROGMEM;
-//  const unsigned char eating_icon[500] PROGMEM;
-//  const unsigned char gaming_icon[500] PROGMEM;
-//  const unsigned char  newbeaver[500] PROGMEM;
-//  const unsigned char  book_icon[500] PROGMEM;
-  
-  public:
-    uint32_t selected;
-    VerticalMenu(TFT_eSPI tftESP);
-    void update(int b1_delta, int b2_delta);
-    void drawCursor();
-    void moveCursor(int increment);
-    void eraseCursor();
-    void displayHome();
-    void displayGrind();
-    void displayEat();
-    void displayPlay();
-    void displayResume();
-
-    void drawEatingIcon();
-    void drawGamingIcon();
-    void drawNewBeaver();
-    void drawBookIcon();
-};
+#define imageWidth 69
+#define imageHeight 104
 
 const unsigned char beaver [] PROGMEM=
 {
@@ -120,7 +71,7 @@ const unsigned char beaver [] PROGMEM=
 
 const unsigned char energy_bar [] PROGMEM=
 {
-  0xff, 0xff, 0xff, 0xfd, 0xff, 0x86, 0x6c, 0x10, 0xf0, 0x9d, 0x86, 0x6c, 0x10, 0x72, 0x5d, 0xbe, 
+	0xff, 0xff, 0xff, 0xfd, 0xff, 0x86, 0x6c, 0x10, 0xf0, 0x9d, 0x86, 0x6c, 0x10, 0x72, 0x5d, 0xbe, 
 0x6d, 0xf7, 0x77, 0x5b, 0xbe, 0x6d, 0xf7, 0x6f, 0xdb, 0xbe, 0x6d, 0xf7, 0x6f, 0xcb, 0xbe, 0xad, 
 0xf7, 0x6f, 0xeb, 0xbe, 0xad, 0xf7, 0x6f, 0xe7, 0x86, 0xac, 0x37, 0x6f, 0xe7, 0x86, 0xac, 0x10, 
 0x6f, 0xe7, 0x86, 0xac, 0x30, 0xec, 0x77, 0xbe, 0xcd, 0xf0, 0xee, 0x77, 0xbe, 0xcd, 0xf6, 0x6f, 
@@ -492,4 +443,3 @@ const unsigned char book_icon [] PROGMEM=
 0x0f, 0xff, 0xff, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xfc, 0xff, 0xff, 0xff, 
 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc, 
 };
-#endif

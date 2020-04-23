@@ -1,12 +1,9 @@
 #include "VerticalMenu.h"
 #include <SPI.h>
 #include <TFT_eSPI.h>
-
-#define HOME 0
-#define GRIND 1
-#define EAT 2
-#define PLAY 3
-#define RESUME 4
+#include <Adafruit_ST7735.h>
+#include <Adafruit_GFX.h>
+#include <pgmspace.h>
 
 VerticalMenu::VerticalMenu(TFT_eSPI tftESP) {
   state = HOME;
@@ -101,6 +98,7 @@ void VerticalMenu::update(int b1_delta, int b2_delta) {
 void VerticalMenu::displayHome() {
   num_items = 4;
   tft.fillScreen(TFT_WHITE);
+  drawNewBeaver();
   tft.setTextColor(TFT_BLACK);
   tft.setTextDatum(TC_DATUM);
   tft.setTextSize(1.8);
@@ -146,6 +144,7 @@ void VerticalMenu::moveCursor(int increment) {
 void VerticalMenu::displayGrind() {
   num_items = 3;
   tft.fillScreen(TFT_WHITE);
+  drawBookIcon();
   tft.setTextColor(TFT_BLACK);
   tft.setTextDatum(TC_DATUM);
   tft.setTextSize(1.8);
@@ -157,6 +156,7 @@ void VerticalMenu::displayGrind() {
 void VerticalMenu::displayEat() {
   num_items = 3;
   tft.fillScreen(TFT_WHITE);
+  drawEatingIcon();
   tft.setTextColor(TFT_BLACK);
   tft.setTextDatum(TC_DATUM);
   tft.setTextSize(1.8);
@@ -169,6 +169,7 @@ void VerticalMenu::displayPlay() {
   // also want to display people online in top corner
   num_items = 3;
   tft.fillScreen(TFT_WHITE);
+  drawGamingIcon();
   tft.setTextColor(TFT_BLACK);
   tft.setTextDatum(TC_DATUM);
   tft.setTextSize(1.8);
@@ -185,4 +186,16 @@ void VerticalMenu::displayResume() {
   tft.setTextSize(1);
   tft.drawString("[To be integrated...]", tft.width()/2, (3*tft.height()/(num_items*2)) + 10, 1);
   drawCursor();
+}
+void VerticalMenu::drawEatingIcon() {
+  tft.drawBitmap(29,0, eating_icon, 70, 70, BLACK);
+}
+void VerticalMenu::drawGamingIcon() {
+  tft.drawBitmap(29,0, gaming_icon, 70,70, BLACK);
+}
+void VerticalMenu::drawNewBeaver() {
+  tft.drawBitmap(29,0, newbeaver, 70,70, BLACK);
+}
+void VerticalMenu::drawBookIcon() {
+  tft.drawBitmap(29,0, book_icon, 70,70, BLACK);
 }
