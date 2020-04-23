@@ -26,7 +26,6 @@ class Timagotchi {
     class_units = 0;
     total_units = 0;
     has_urop = 0;
-    semester = starting_semester;
     strcpy(user, input_user);
     last_time_fed = time(NULL);
   }
