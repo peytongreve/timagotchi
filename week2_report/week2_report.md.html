@@ -1,0 +1,57 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-"><link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/apidoc.css?">
+
+						  **Week 1 Report**
+
+
+by Julian Manyika, Peyton Greve, Kyle Sandell, Brett Allen, Alex Cho and Haran Nadarajah
+
+
+# Populating server
+
+(showing code)
+
+# Timagotchi Actions
+
+(showing code)
+
+# Menu Display
+
+Consists of three parts: Cool Button, Vertical Menu, Icons
+
+### Cool Button
+
+The Cool Button is an upgraded version of the Nice Button, with short and long presses, that we made in an exercise. produces four different kinds of outputs on every update, which in the diagram are called ‘flags’. These represents what kind of press the user has done with the button: 
+
+* Flag = 0: no press
+* Flag = 1: short press
+* Flag = 2: long press
+* Flag = 3: double click
+
+When used in any process, the flags output by the button are meant to be kept track of, and in every cycle, the current flag should be compared to the old flag; the difference between them determines the button delta, which, when not equal to zero, indicates that something (depending on the integrated system) should happen. Below is the state diagram
+
+![Vertical Menu](CoolButtonDiagram.png)
+
+### Vertical Menu
+
+This is the main vertical menu for the Timagotchi device. The user can toggle between different options using right button short clicks, select items using right button double clicks, and go back to the previous menu using left button double clicks. 
+
+![Vertical Menu](https://www.youtube.com/watch?v=K4gU4emfEPU&list=UUAddou6GGFJpgP2T2pp52XA)
+
+# Initialization
+
+The initialization portion consists of two parts: device side and server side.
+
+The device boots up as a pokemon-style data collection wherein the user is prompted for various things such as name, course number, units they are taking, and their activity. All other attributes are then calculated such as happiness (based on major/units), hunger (always set to 10), and UROP (always initially set to 0).
+
+From there, it POSTs to the server the information that has been initialized for the server to create a new user.
+
+
+# Research Speech API
+
+(will describe in person)
+
+
+
+<!--?prettify?--></LOOP_PERIOD>
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'medium'};</script>
+<!-- Markdeep: --><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
