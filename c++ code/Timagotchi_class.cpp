@@ -16,6 +16,7 @@ class Timagotchi {
   char extracurriculars[200]; // char array separated by commas for extracurriculars
   uint8_t num_ecs; // number of extracurriculars
   char user[];
+  uint8_t semester;
   time_t last_time_fed;
   public:
   Timagotchi(char* input_user, uint8_t declare_major, uint8_t starting_semester) {
@@ -26,6 +27,7 @@ class Timagotchi {
     class_units = 0;
     total_units = 0;
     has_urop = 0;
+    semester = starting_semester;
     strcpy(user, input_user);
     last_time_fed = time(NULL);
   }
