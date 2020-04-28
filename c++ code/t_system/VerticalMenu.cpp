@@ -48,7 +48,7 @@ int VerticalMenu::update(int b1_delta, int b2_delta) {
         moveCursor(-1);
       } else if (b2_delta == -1) {
         moveCursor(1);
-      } else if (b1_delta == -3) {
+      } else if (b2_delta == -3) {
         // editing flag to tell main code to use trivia object
         if (selected == 1) {
           flag = PSET;
@@ -81,7 +81,7 @@ int VerticalMenu::update(int b1_delta, int b2_delta) {
         moveCursor(-1);
       } else if (b2_delta == -1) {
         moveCursor(1);
-      } else if (b1_delta == -3) {
+      } else if (b2_delta == -3) {
         if (selected == 1) {
           flag = INFINITE;
         }

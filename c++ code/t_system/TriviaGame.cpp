@@ -1,58 +1,125 @@
-#ifndef TriviaGame_h
-#define TriviaGame_h
+
+#include "TriviaGame.h"
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <WiFi.h> //Connect to WiFi Network
 
-
-TriviaGame::TriviaGame(char * u, char * wn, char * wp, TFT_eSPI tftESP) {
-  strcpy(user, u);
-  strcpy(wifi_name, wn);
-  strcpy(wifi_password, wp);
+TriviaGame::TriviaGame() {
   question_timer = millis();
   right_answer = 0;
   total_questions = 0;
   score = 0;
   state = REST;
-  selection = 0;
-  tft = tftESP;
-  
+  selected = 0;
+  flag = 0;
 }
 
-void TriviaGame::update(b1_delta, b2_delta) {
-  // state machine
+void TriviaGame::initialize(char * u, char * wn, char * wp, TFT_eSPI tftESP, boolean mp) {
+  //TODO: pass a timagotchi object as an argument
+//  strcpy(username, u);
+//  strcpy(wifi_name, wn);
+//  strcpy(wifi_password, wp);
+  tft = tftESP;
+}
+
+int TriviaGame::update(int b1_delta, int b2_delta) {
+  switch (state) {
+    case REST:
+      if (b1_delta != 0 or b2_delta != 0) {
+        state = QUESTION;
+        getTrivia();
+      }
+      break;
+    case QUESTION:
+      if (b1_delta == -1) {
+        moveCursor(-1);
+      } else if (b2_delta == -1) {
+        moveCursor(1);
+      } else if (b2_delta == -3) {
+        state = ANSWER;
+        buzzer();
+      }
+      break;
+    case ANSWER:
+      if (b2_delta == -1) {
+        state = QUESTION;
+        getTrivia();
+      } else if (b1_delta == -3) {
+        state = PAUSE;
+        tempDisplay();
+      }
+      break;
+    case PAUSE:
+      if (b1_delta == -2) {
+        flag = 1;
+        // code to save everything, update timagotchi, all that jazz
+      }
+      break;
+    case EXIT: // not sure if we really need this state
+      flag = 1;
+      break;
+  }
+  return flag;
 }
 
 /*
  * should make a get request for trivia, display all the possible choices, and give the correct answer
  * 
  */
-void TriviaGame::get_trivia() {
+void TriviaGame::getTrivia() {
   // request to proxy
   
   // &question&option1&option2&option3&option4&correctChoice
   char response[200];
   sprintf(response, "question&answer1&answer2&answer3&answer4&correctOp"); // correct op to be indexed by 1
-  count = 0;
+  int count = 0;
   char * p;
+  tft.fillScreen(TFT_WHITE);
+  tft.setCursor(0, 0);
   while (p != NULL) {
-    if (count <= 4) {
-      tft.println(p);
-    } else {
-      accuracy = atoi(p);
+    switch (count) {
+      case 0:
+        tft.println(p);
+        tft.setCursor(0, 64);
+        break;
+      case 1:
+        tft.print("A. ");
+        tft.println(p);
+        break;
+      case 2:
+        tft.print("B. ");
+        tft.println(p);
+        break;
+      case 3:
+        tft.print("C. ");
+        tft.println(p);
+        break;
+      case 4:
+        tft.print("D. ");
+        tft.println(p);
+        break;
+      case 5:
+        right_answer = atoi(p);
+        break;
     }
     count++;
     p = strtok (NULL, "&");
   }
-  // ...
 }
 
 /*
  * puts green cursor around right answer
  */
 void TriviaGame::buzzer() {
-  selection = right_answer;
+  for (int i = 1; i < 5; i++) {
+    if (i != selected and i != right_answer) {
+      tft.fillRect(10, ((4+i-1)*tft.height())/8, tft.width()-20, tft.height()/8, TFT_WHITE);
+    }
+  }
+  drawCursor(TFT_RED);
+  selected = right_answer;
   drawCursor(TFT_GREEN);
+  selected = 0;
 }
 
 void TriviaGame::tempDisplay() {
@@ -64,7 +131,7 @@ void TriviaGame::displayPause() {
 }
 
 /*
- * once the user presses pause, post statistics
+ * once the user presses pause (or exits), post statistics to the server and update timagotchi
  */
 void TriviaGame::post_stats() {
   
@@ -75,8 +142,8 @@ void TriviaGame::eraseCursor() {
 }
 
 void TriviaGame::drawCursor(uint32_t color) {
-  int top = ((num_items+selected-1)*tft.height())/(num_items*2);
-  int bottom = ((num_items+selected)*tft.height())/(num_items*2);
+  int top = ((4+selected-1)*tft.height())/8;
+  int bottom = ((4+selected)*tft.height())/8;
   int left = 10;
   int right = tft.width() - 10;
   tft.drawLine(left, top, right, top, color);
@@ -95,4 +162,28 @@ void TriviaGame::moveCursor(int increment) {
     selected = (-1*selected-4) % 4;
   }
   drawCursor(TFT_RED);
+}
+
+void TriviaGame::connect_to_WiFi() {
+  WiFi.begin(wifi_name, wifi_password); //attempt to connect to wifi
+  uint8_t count = 0; //count used for Wifi check times
+  Serial.print("Attempting to connect to ");
+  Serial.println(wifi_name);
+  while (WiFi.status() != WL_CONNECTED && count < 12) {
+    delay(500);
+    Serial.print(".");
+    count++;
+  }
+  delay(2000);
+  if (WiFi.isConnected()) { //if we connected then print our IP, Mac, and SSID we're on
+    Serial.println("CONNECTED!");
+    Serial.printf("%d:%d:%d:%d (%s) (%s)\n", WiFi.localIP()[3], WiFi.localIP()[2],
+                  WiFi.localIP()[1], WiFi.localIP()[0],
+                  WiFi.macAddress().c_str() , WiFi.SSID().c_str());
+    delay(500);
+  } else { //if we failed to connect just Try again.
+    Serial.println("Failed to Connect :/  Going to restart");
+    Serial.println(WiFi.status());
+    ESP.restart(); // restart the ESP (proper way)
+  }
 }

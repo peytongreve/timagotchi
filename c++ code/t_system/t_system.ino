@@ -9,15 +9,17 @@ TFT_eSPI tft = TFT_eSPI();
 
 #define IDLE 0
 #define NAV 1
-#define TRIVIA 2
-#define INFINITE 3
+#define SP_TRIVIA 2
+#define MP_TRIVIA 3
+#define INFINITE 4
 
 const int single_trivia_flag = 10;
 const int multi_trivia_flag = 11;
 const int infinite_run_flag = 30;
 
-char network[] = "kumba17";
-char password[] = "jsjnetworkyekumba17";
+char * network = "kumba17";
+char * password = "jsjnetworkyekumba17";
+char * username = "julian";
 
 const int BUTTON_PIN_1 = 16;
 const int BUTTON_PIN_2 = 5;
@@ -30,7 +32,8 @@ int flag;
 int state;
 
 VerticalMenu menu = VerticalMenu(tft);
-TriviaGame trivia;
+TriviaGame sp_trivia;
+//TriviaGame mp_trivia = TriviaGame(username, network, password, tft, false);
 //InfiniteRun infinite;
 
 void setup() {
@@ -50,18 +53,19 @@ void setup() {
   pinMode(14, OUTPUT); //controlling TFT with hardware power management
   digitalWrite(14, HIGH);
   state = 1;
+  menu.displayHome();
+  Serial.println("STARTING");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   button1_flag = button1.update();
   button2_flag = button2.update();
   button1_delta = button1_flag - old_button1_flag;
   button2_delta = button2_flag - old_button2_flag;
   // those deltas determine what kind of press was made
-  if (button1_delta != 0 or button2_delta != 0) {
-    fsm(button1_delta, button2_delta);
-  }
+  //if (button1_delta != 0 or button2_delta != 0) {
+  fsm(button1_delta, button2_delta);
+  //}
   old_button1_flag = button1_flag;
   old_button2_flag = button2_flag;
 }
@@ -75,30 +79,42 @@ void fsm(int b1_delta, int b2_delta) {
     case NAV:
       flag = menu.update(b1_delta, b2_delta);
       if (flag == single_trivia_flag) {
-        state = TRIVIA;
-        //trivia = TriviaGame(single);
+        state = SP_TRIVIA;
+        Serial.println("Problem?");
+        sp_trivia.initialize(username, network, password, tft, false);
       } else if (flag == multi_trivia_flag) {
-        state = TRIVIA;
+        state = MP_TRIVIA;
         //trivia = TriviaGame(multi);
       } else if (flag == infinite_run_flag) {
         state = INFINITE;
         //infinite = InfiniteRun();
       }
       break;
-    case TRIVIA:
-      flag = trivia.update(b1_delta, b2_delta);
+    case SP_TRIVIA:
+      flag = sp_trivia.update(b1_delta, b2_delta);
+      if (flag != 0) {
+        state = NAV;
+        menu.displayHome();
+      }
+      break;
+    case MP_TRIVIA:
+      //flag = mp_trivia.update(b1_delta, b2_delta);
       if (flag != 0) {
         state = NAV;
         menu.displayHome();
       }
       break;
     case INFINITE:
-      flag = infinite.update(b1_delta, b2_delta);
-      if (flag != 0) {
+      flag = 0;
+      //flag = infinite.update(b1_delta, b2_delta);
+      if (flag != 0 or b1_delta != 0) {
         state = NAV;
         menu.displayHome();
       }
       break;
+  }
+  if (flag != 0) {
+    Serial.println(flag);
   }
 }
 
