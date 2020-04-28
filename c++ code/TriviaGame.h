@@ -18,7 +18,7 @@ class TriviaGame
   const char wifi_name[50];
   const char wifi_password[50];
   uint32_t question_timer;
-  uint32_t right_answers;
+  uint32_t right_answer;
   uint32_t total_questions;
   uint32_t score;
   uint8_t state;
@@ -26,7 +26,7 @@ class TriviaGame
   TFT_eSPI tft;
   
   public:
-    TriviaGame(user, wifi_name, wifi_password);
+    TriviaGame(user, wifi_name, wifi_password, tftESP);
     void update(int b1_delta, int b2_delta);
     void get_trivia();
     void post_stats();
