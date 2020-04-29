@@ -5,13 +5,17 @@
 #include <TFT_eSPI.h>
 #include <WiFi.h> //Connect to WiFi Network
 #include <string.h>
+#include <mpu6050_esp32.h>
+
 TFT_eSPI tft = TFT_eSPI();
 
-#define IDLE 0
-#define NAV 1
-#define SP_TRIVIA 2
-#define MP_TRIVIA 3
-#define INFINITE 4
+#define LANDING 0
+#define LOGIN 1
+#define INIT 2
+#define NAV 3
+#define SP_TRIVIA 4
+#define MP_TRIVIA 5
+#define INFINITE 6
 
 const int multi_trivia_flag = 10;
 const int single_trivia_flag = 11;
@@ -30,9 +34,11 @@ CoolButton button2(BUTTON_PIN_2);
 int old_button1_flag, old_button2_flag, button1_flag, button2_flag, button1_delta, button2_delta;
 int flag;
 int state;
+boolean imu_activated;
 
 VerticalMenu menu = VerticalMenu(tft);
 TriviaGame sp_trivia;
+MPU6050 imu;
 //TriviaGame mp_trivia = TriviaGame(username, network, password, tft, false);
 //InfiniteRun infinite;
 
@@ -41,6 +47,15 @@ void setup() {
   Serial.begin(115200);               // Set up serial port
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);
+
+  if (imu.setupIMU(1)) {
+    Serial.println("IMU Connected!");
+  } else {
+    Serial.println("IMU Not Connected :/");
+    Serial.println("Restarting");
+    ESP.restart(); // restart the ESP (proper way)
+  }
+  
   tft.init();
   tft.setRotation(2);
   tft.setTextSize(1);
@@ -55,6 +70,7 @@ void setup() {
   state = 1;
   menu.displayHome();
   Serial.println("STARTING");
+  imu_activated = false;
 }
 
 void loop() {
@@ -87,6 +103,7 @@ void fsm(int b1_delta, int b2_delta) {
         //trivia = TriviaGame(multi);
       } else if (flag == infinite_run_flag) {
         state = INFINITE;
+        imu_activated = true;
         //infinite = InfiniteRun();
       }
       break;
@@ -106,9 +123,11 @@ void fsm(int b1_delta, int b2_delta) {
       break;
     case INFINITE:
       flag = 0;
+      
       //flag = infinite.update(b1_delta, b2_delta);
       if (flag != 0 or b1_delta != 0) {
         state = NAV;
+        imu_activated = false;
         menu.displayHome();
       }
       break;
