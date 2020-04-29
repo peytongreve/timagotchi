@@ -29,7 +29,7 @@ void Ball::step(float x_force=0) { // use the force from the imu
 }
 
 void Ball::reset() {
-    x_pos = tftESP.width() / 2;
+    x_pos = tft.width() / 2;
     x_vel = 0;
 }
 

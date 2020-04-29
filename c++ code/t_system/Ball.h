@@ -24,9 +24,9 @@ class Ball
 
     public:
         Ball(TFT_eSPI tftESP, MPU6050 imu_arg);
-        void step();
+        void step(float x_force);
         void reset();
-    private:
         void moveBall();
+    private:
 };
 #endif

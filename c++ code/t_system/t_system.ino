@@ -1,6 +1,8 @@
 #include "CoolButton.h"
 #include "VerticalMenu.h"
 #include "TriviaGame.h"
+#include "Initialization.h"
+#include "Login.h"
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <WiFi.h> //Connect to WiFi Network
@@ -39,6 +41,8 @@ boolean imu_activated;
 VerticalMenu menu = VerticalMenu(tft);
 TriviaGame sp_trivia;
 MPU6050 imu;
+Initialization timCreator = Initialization(tft);
+Login login = Login(tft);
 //TriviaGame mp_trivia = TriviaGame(username, network, password, tft, false);
 //InfiniteRun infinite;
 
@@ -67,10 +71,20 @@ void setup() {
   connect_to_WiFi();
   pinMode(14, OUTPUT); //controlling TFT with hardware power management
   digitalWrite(14, HIGH);
-  state = 1;
-  menu.displayHome();
+  state = LANDING;
   Serial.println("STARTING");
   imu_activated = false;
+  
+  // Opening screen
+  tft.setTextColor(TFT_BLACK, TFT_WHITE);
+  tft.setCursor(0, tft.height()/4);
+  tft.println("double click to log in");
+  tft.setCursor(0, 2*tft.height()/4);
+  tft.println("long press to make new timagotchi");
+  tft.setCursor(0, 3*tft.height()/4);
+  tft.setTextColor(TFT_LIGHTGREY);
+  tft.println("(right button)");
+  tft.setTextColor(TFT_BLACK);
 }
 
 void loop() {
@@ -88,9 +102,26 @@ void loop() {
 
 void fsm(int b1_delta, int b2_delta) {
   switch (state) {
-    case IDLE:
-      state = NAV;
-      menu.displayHome();
+    case LANDING:
+      if (b2_delta == -3) {
+        state = LOGIN;
+      } else if (b2_delta == -2) {
+        state = INIT;
+      }
+      break;
+    case LOGIN:
+      flag = login.update(b1_delta, b2_delta);
+      if (flag != 0) {
+        state = NAV;
+        menu.displayHome();
+      }
+      break;
+    case INIT:
+      flag = timCreator.update(abs(b1_delta), abs(b2_delta));
+      if (flag != 0) {
+        state = NAV;
+        menu.displayHome();
+      }
       break;
     case NAV:
       flag = menu.update(b1_delta, b2_delta);

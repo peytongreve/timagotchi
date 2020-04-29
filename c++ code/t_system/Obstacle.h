@@ -15,7 +15,9 @@ class Obstacle {
     TFT_eSPI tft;
 
     public:
-        void step();
-}
+      Obstacle(TFT_eSPI tftESP, float x);
+      Obstacle(TFT_eSPI tftESP, float x, float vel, int length, int height);
+      void step();
+};
 
 #endif

@@ -2,7 +2,19 @@
 #include <SPI.h>
 #include <TFT_eSPI.h>
 
-Obstacle::Obstacle(TFT_eSPI tftESP, float x, float vel=5, int length=10, int height=5) {
+Obstacle::Obstacle(TFT_eSPI tftESP, float x) {
+    X_POS = x; // starting x
+    y_pos = 0;
+    y_vel = 5; // delta y (must be positive)
+    OBSTACLE_CLR = TFT_BLACK;
+    BKGND_CLR = TFT_WHITE;
+    WIDTH = 10;
+    HEIGHT = 5;
+    BOTTOM = tftESP.height() - HEIGHT;
+    tft = tftESP;
+}
+
+Obstacle::Obstacle(TFT_eSPI tftESP, float x, float vel, int length, int height) {
     X_POS = x; // starting x
     y_pos = 0;
     y_vel = vel; // delta y (must be positive)
