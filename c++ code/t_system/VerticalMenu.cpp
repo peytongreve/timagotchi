@@ -12,6 +12,7 @@ VerticalMenu::VerticalMenu(TFT_eSPI tftESP) {
   tft = tftESP;
 }
 int VerticalMenu::update(int b1_delta, int b2_delta) {
+  flag = 0;
   switch(state) {
     case HOME:
       if (b1_delta == -1) {

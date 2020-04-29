@@ -13,8 +13,8 @@ TFT_eSPI tft = TFT_eSPI();
 #define MP_TRIVIA 3
 #define INFINITE 4
 
-const int single_trivia_flag = 10;
-const int multi_trivia_flag = 11;
+const int multi_trivia_flag = 10;
+const int single_trivia_flag = 11;
 const int infinite_run_flag = 30;
 
 char * network = "kumba17";
@@ -116,6 +116,7 @@ void fsm(int b1_delta, int b2_delta) {
   if (flag != 0) {
     Serial.println(flag);
   }
+  flag = 0;
 }
 
 ////////////////////////////////////////////////////////////////////

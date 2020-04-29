@@ -8,10 +8,12 @@ TriviaGame::TriviaGame() {
   question_timer = millis();
   right_answer = 0;
   total_questions = 0;
+  total_correct = 0;
   score = 0;
   state = REST;
   selected = 0;
   flag = 0;
+  //connect_to_WiFi();
 }
 
 void TriviaGame::initialize(char * u, char * wn, char * wp, TFT_eSPI tftESP, boolean mp) {
@@ -20,9 +22,12 @@ void TriviaGame::initialize(char * u, char * wn, char * wp, TFT_eSPI tftESP, boo
 //  strcpy(wifi_name, wn);
 //  strcpy(wifi_password, wp);
   tft = tftESP;
+  tft.fillScreen(TFT_WHITE);
+  tft.drawString("Press any button to start", 0, 0);
 }
 
 int TriviaGame::update(int b1_delta, int b2_delta) {
+  flag = 0;
   switch (state) {
     case REST:
       if (b1_delta != 0 or b2_delta != 0) {
@@ -71,30 +76,35 @@ void TriviaGame::getTrivia() {
   
   // &question&option1&option2&option3&option4&correctChoice
   char response[200];
-  sprintf(response, "question&answer1&answer2&answer3&answer4&correctOp"); // correct op to be indexed by 1
+  sprintf(response, "Which of the following animals do not exist in the United States?&Alligator Snapping Turtle&Gila Monster&Jaguar&Birds&4"); // correct op to be indexed by 1
   int count = 0;
   char * p;
+  p = strtok(response, "&");
   tft.fillScreen(TFT_WHITE);
   tft.setCursor(0, 0);
+  tft.setTextColor(TFT_BLACK, TFT_WHITE);
   while (p != NULL) {
     switch (count) {
       case 0:
         tft.println(p);
-        tft.setCursor(0, 64);
         break;
       case 1:
+        tft.setCursor(2, (4*tft.height())/8 + 2);
         tft.print("A. ");
         tft.println(p);
         break;
       case 2:
+        tft.setCursor(2, (5*tft.height())/8 + 2);
         tft.print("B. ");
         tft.println(p);
         break;
       case 3:
+        tft.setCursor(2, (6*tft.height())/8 + 2);
         tft.print("C. ");
         tft.println(p);
         break;
       case 4:
+        tft.setCursor(2, (7*tft.height())/8 + 2);
         tft.print("D. ");
         tft.println(p);
         break;
@@ -113,21 +123,30 @@ void TriviaGame::getTrivia() {
 void TriviaGame::buzzer() {
   for (int i = 1; i < 5; i++) {
     if (i != selected and i != right_answer) {
-      tft.fillRect(10, ((4+i-1)*tft.height())/8, tft.width()-20, tft.height()/8, TFT_WHITE);
+      tft.fillRect(0, ((4+i-1)*tft.height())/8, tft.width(), tft.height()/8, TFT_WHITE);
     }
   }
   drawCursor(TFT_RED);
+  if (selected == right_answer) {
+    total_correct++;
+  }
   selected = right_answer;
   drawCursor(TFT_GREEN);
   selected = 0;
+  total_questions++;
 }
 
 void TriviaGame::tempDisplay() {
   tft.fillScreen(TFT_WHITE);
+  tft.setCursor(0, 0);
+  tft.println("long press b1 to go back to main menu");
 }
 
 void TriviaGame::displayPause() {
   tft.fillScreen(TFT_WHITE);
+  tft.fillScreen(TFT_WHITE);
+  tft.setCursor(0, 0);
+  tft.println("long press b1 to go back to main menu");
 }
 
 /*
@@ -144,8 +163,8 @@ void TriviaGame::eraseCursor() {
 void TriviaGame::drawCursor(uint32_t color) {
   int top = ((4+selected-1)*tft.height())/8;
   int bottom = ((4+selected)*tft.height())/8;
-  int left = 10;
-  int right = tft.width() - 10;
+  int left = 0;
+  int right = tft.width();
   tft.drawLine(left, top, right, top, color);
   tft.drawLine(left, bottom, right, bottom, color);
   tft.drawLine(left, top, left, bottom, color);

@@ -20,6 +20,7 @@ class TriviaGame
     uint32_t question_timer;
     uint32_t right_answer;
     uint32_t total_questions;
+    uint32_t total_correct;
     uint32_t score;
     uint8_t state;
     uint8_t selected;
