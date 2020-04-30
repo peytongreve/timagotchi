@@ -113,6 +113,13 @@ void VerticalMenu::displayHome() {
   num_items = 4;
   tft.fillScreen(TFT_WHITE);
   drawNewBeaver();
+  // health and happiness bars
+  tft.fillRect(0, 0, 29, 70, TFT_WHITE);
+  tft.fillRect(2, 2, 25, 66, TFT_GREEN);
+  
+  tft.fillRect(tft.width() - 29, 0, tft.width()-29, 70, TFT_WHITE);
+  tft.fillRect(tft.width() - 27, 2, 25, 66, TFT_RED); 
+  
   tft.setTextColor(TFT_BLACK);
   tft.setTextDatum(TC_DATUM);
   tft.setTextSize(1.8);

@@ -23,8 +23,8 @@ const int multi_trivia_flag = 10;
 const int single_trivia_flag = 11;
 const int infinite_run_flag = 30;
 
-char * network = "TheAllens2.4";
-char * password = "magnolia";
+char * network = "kumba17";
+char * password = "jsjnetworkyekumba17";
 char * username = "julian";
 
 const int BUTTON_PIN_1 = 16;
