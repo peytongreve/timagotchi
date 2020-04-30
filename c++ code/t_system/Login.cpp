@@ -25,6 +25,7 @@ int Login::update(int b1_delta, int b2_delta) {
       if(b1_delta != 0 || b2_delta != 0){
         state = NAME;
         draw = true;
+        letter_index = 0;
       }
       break;
     case NAME:
@@ -32,11 +33,11 @@ int Login::update(int b1_delta, int b2_delta) {
         drawName();
         draw = false;
       }
-      if(b2_delta == -1){
+      if(b2_delta == 1){
         letter_index = (letter_index + 1)%26;
         draw = true;
       }
-      else if(b2_delta == -3){
+      else if(b2_delta == 3){
         login_username[user_index] = letters[letter_index];
         user_index = user_index + 1;
         if(user_index == 10){
@@ -44,7 +45,7 @@ int Login::update(int b1_delta, int b2_delta) {
         }
         draw = true;
       }
-      else if(b1_delta == -3){
+      else if(b1_delta == 1){
         state = END;
         draw = true;
       }
@@ -92,13 +93,13 @@ void Login::drawName(){
   tft.drawString("Make your username!", tft.width()/2, tft.height()/2-60, 1);
   tft.drawString("Click right button to", tft.width()/2, tft.height()/2-40, 1);
   tft.drawString("choose a new letter", tft.width()/2, tft.height()/2-30, 1);
-  tft.drawString("Double click right", tft.width()/2, tft.height()/2-20, 1);
-  tft.drawString("to confirm letter", tft.width()/2, tft.height()/2-10, 1);
-  tft.drawString("Click left button", tft.width()/2, tft.height()/2, 1);
-  tft.drawString("to move on", tft.width()/2, tft.height()/2+10, 1);
+  tft.drawString("Double click right", tft.width()/2, tft.height()/2-10, 1);
+  tft.drawString("to confirm letter", tft.width()/2, tft.height()/2, 1);
+  tft.drawString("Click left button", tft.width()/2, tft.height()/2+20, 1);
+  tft.drawString("to move on", tft.width()/2, tft.height()/2+30, 1);
   sprintf(prompt, "Currently choosing: %c", letters[letter_index]);
-  tft.drawString(prompt, tft.width()/2, tft.height()/2+20, 1);
-  tft.drawString(login_username, tft.width()/2, tft.height()/2+30, 1);
+  tft.drawString(prompt, tft.width()/2, tft.height()/2+50, 1);
+  tft.drawString(login_username, tft.width()/2, tft.height()/2+60, 1);
 }
 
 void Login::drawEnd(){

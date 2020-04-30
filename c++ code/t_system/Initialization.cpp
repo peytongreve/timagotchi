@@ -134,13 +134,13 @@ void Initialization::drawName(){
   tft.drawString("Make your username!", tft.width()/2, tft.height()/2-60, 1);
   tft.drawString("Click right button to", tft.width()/2, tft.height()/2-40, 1);
   tft.drawString("choose a new letter", tft.width()/2, tft.height()/2-30, 1);
-  tft.drawString("Double click right", tft.width()/2, tft.height()/2-20, 1);
-  tft.drawString("to confirm letter", tft.width()/2, tft.height()/2-10, 1);
-  tft.drawString("Click left button", tft.width()/2, tft.height()/2, 1);
-  tft.drawString("to move on", tft.width()/2, tft.height()/2+10, 1);
+  tft.drawString("Double click right", tft.width()/2, tft.height()/2-10, 1);
+  tft.drawString("to confirm letter", tft.width()/2, tft.height()/2, 1);
+  tft.drawString("Click left button", tft.width()/2, tft.height()/2+20, 1);
+  tft.drawString("to move on", tft.width()/2, tft.height()/2+30, 1);
   sprintf(prompt, "Currently choosing: %c", letters[letter_index]);
-  tft.drawString(prompt, tft.width()/2, tft.height()/2+20, 1);
-  tft.drawString(init_username, tft.width()/2, tft.height()/2+30, 1);
+  tft.drawString(prompt, tft.width()/2, tft.height()/2+50, 1);
+  tft.drawString(init_username, tft.width()/2, tft.height()/2+60, 1);
 }
 
 void Initialization::drawCourse(){
@@ -149,12 +149,12 @@ void Initialization::drawCourse(){
   tft.setTextDatum(TC_DATUM);
   tft.setTextSize(1.8);
   tft.drawString("What is your course?", tft.width()/2, tft.height()/2-50, 1);
-  tft.drawString("Click right button to", tft.width()/2, tft.height()/2-40, 1);
-  tft.drawString("increase course number", tft.width()/2, tft.height()/2-30, 1);
-  tft.drawString("Click left button", tft.width()/2, tft.height()/2-20, 1);
-  tft.drawString("to move on", tft.width()/2, tft.height()/2-10, 1);
+  tft.drawString("Click right button to", tft.width()/2, tft.height()/2-30, 1);
+  tft.drawString("increase course number", tft.width()/2, tft.height()/2-20, 1);
+  tft.drawString("Click left button", tft.width()/2, tft.height()/2, 1);
+  tft.drawString("to move on", tft.width()/2, tft.height()/2+10, 1);
   sprintf(prompt, "Currently choosing: %d", course_num);
-  tft.drawString(prompt, tft.width()/2, tft.height()/2, 1);
+  tft.drawString(prompt, tft.width()/2, tft.height()/2+30, 1);
 }
 
 void Initialization::drawEnd(){

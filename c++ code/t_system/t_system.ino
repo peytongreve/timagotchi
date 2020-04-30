@@ -23,8 +23,8 @@ const int multi_trivia_flag = 10;
 const int single_trivia_flag = 11;
 const int infinite_run_flag = 30;
 
-char * network = "kumba17";
-char * password = "jsjnetworkyekumba17";
+char * network = "TheAllens2.4";
+char * password = "magnolia";
 char * username = "julian";
 
 const int BUTTON_PIN_1 = 16;
@@ -75,19 +75,23 @@ void setup() {
   Serial.println("STARTING");
   imu_activated = false;
   
-  // Opening screen
-  tft.setTextColor(TFT_BLACK, TFT_WHITE);
-  tft.setCursor(0, tft.height()/4);
-  tft.println("double click to log in");
-  tft.setCursor(0, 2*tft.height()/4);
-  tft.println("long press to make new timagotchi");
-  tft.setCursor(0, 3*tft.height()/4);
-  tft.setTextColor(TFT_LIGHTGREY);
-  tft.println("(right button)");
+  tft.fillScreen(TFT_WHITE);
   tft.setTextColor(TFT_BLACK);
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextSize(1.8);
+  tft.drawString("Welcome to Timagochi!", tft.width()/2, tft.height()/2-60, 1);
+  tft.drawString("Click left button to", tft.width()/2, tft.height()/2-40, 1);
+  tft.drawString("log in!", tft.width()/2, tft.height()/2-30, 1);
+  tft.drawString("Click right button to", tft.width()/2, tft.height()/2-10, 1);
+  tft.drawString("create new!", tft.width()/2, tft.height()/2, 1);
+  tft.drawString("Enjoy!", tft.width()/2, tft.height()/2+20, 1);
 }
 
 void loop() {
+  if(state == INIT){
+    button1.read();
+    button2.read();
+  }
   button1_flag = button1.update();
   button2_flag = button2.update();
   button1_delta = button1_flag - old_button1_flag;
@@ -103,9 +107,9 @@ void loop() {
 void fsm(int b1_delta, int b2_delta) {
   switch (state) {
     case LANDING:
-      if (b2_delta == -3) {
+      if (b1_delta == -1) {
         state = LOGIN;
-      } else if (b2_delta == -2) {
+      } else if (b2_delta == -1) {
         state = INIT;
       }
       break;
@@ -117,7 +121,7 @@ void fsm(int b1_delta, int b2_delta) {
       }
       break;
     case INIT:
-      flag = timCreator.update(abs(b1_delta), abs(b2_delta));
+      flag = timCreator.update(b1_delta, b2_delta);
       if (flag != 0) {
         state = NAV;
         menu.displayHome();
