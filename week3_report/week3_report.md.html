@@ -22,12 +22,39 @@ by Julian Manyika, Peyton Greve, Kyle Sandell, Brett Allen, Alex Cho and Haran N
 
 **Deliverable**: Create trivia game class that includes ability to answer multiple choice and true or false question. Keeps track of score using point system where as points increase so does happiness.
 
+The Trivia class utilizes elements of our previous trivia design exercise and the display strategies in the vertical menu.
+
+* While we're using the same trivia server for the trivia, the context of where the data goes and where the trivia class in c++ is located is very different.
+	* In tandem with the menu-to-menu connection goal, we had to make a finite state machine in an update function that allowed the object to signal higher system state changes
+	* An even greater challenge was making the link between the Trivia object and the Timagotchi object
+
+* While we utilized a display strategy similar to that of the VerticalMenu class, this one had to accommodate for more text and answer feedback
+	* We had to use print statements instead of drawing strings to allow for overflow
+	* we changed the margins of the cursors
+	* most significantly, we added a buzzer function, where once a user selects an answer, the selected answer and the right answer are the only answers shown on the screen:
+		* if the user is right, only their selected answer is shown with a green cursor.
+		* if the user is wrong, their selected answer remains, with the red cursor, and the correct answer remains, with a green cursor.
+
+![Trivia State Diagram](SPTriviaStateDiagram.jpg)
 
 
 # Basic login
 
 **Deliverable**: user should have to enter their username every time they open up their device, or they can create a timagotchi with a new username
 
+This utilized the code from the initialization that was done in week 2, but only requires a name. It's still a work in progress. The server integration is trickier and more time intensive than I had anticipated, and will require a more integrated system to be ready before it's fully implemented. Below are some things we'll have to consider:
+
+* Since part of the point of a username is user accessibility without having to change code, should we also allow them to enter their wifi network and password?
+
+* For easier text entry, do we make a virtual keyboard where the buttons are used to toggle between and select keys?
+
+* For security, do we want to require a password for each account? Do we encrypt it? How should we do that?
+
+* An additional accessibility upgrade would be to allow the user to only have to enter their password or wifi if they haven't logged in for several days.
+
+* An even cooler accessibility upgrade would be autocomplete for usernames (if the user has logged in recently).
+
+Just some thoughts. Wasn't able to reach this deliverable, but it could end up being a pretty central part of our work going forward.
 
 
 # Hunger and Happiness meters, login key icon
