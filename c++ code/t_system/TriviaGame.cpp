@@ -58,6 +58,9 @@ int TriviaGame::update(int b1_delta, int b2_delta) {
       if (b1_delta == -2) {
         flag = 1;
         // code to save everything, update timagotchi, all that jazz
+      } else if (b2_delta != 0) {
+        state = QUESTION;
+        getTrivia();
       }
       break;
     case EXIT: // not sure if we really need this state

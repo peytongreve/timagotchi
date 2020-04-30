@@ -1,8 +1,10 @@
 #include "Ball.h"
 #include <SPI.h>
 #include <TFT_eSPI.h>
+#include <mpu6050_esp32.h>
 
-Ball::Ball(TFT_eSPI tftESP) {
+Ball::Ball(TFT_eSPI tftESP, MPU6050 imu_arg) {
+    imu = imu_arg;
     x_pos = tftESP.width()/2;
     Y_POS = (3/4)*tftESP.height();
     x_vel = 0;
@@ -27,7 +29,7 @@ void Ball::step(float x_force=0) { // use the force from the imu
 }
 
 void Ball::reset() {
-    x_pos = tftESP.width() / 2;
+    x_pos = tft.width() / 2;
     x_vel = 0;
 }
 

@@ -1,17 +1,23 @@
 #include "CoolButton.h"
 #include "VerticalMenu.h"
 #include "TriviaGame.h"
+#include "Initialization.h"
+#include "Login.h"
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <WiFi.h> //Connect to WiFi Network
 #include <string.h>
+#include <mpu6050_esp32.h>
+
 TFT_eSPI tft = TFT_eSPI();
 
-#define IDLE 0
-#define NAV 1
-#define SP_TRIVIA 2
-#define MP_TRIVIA 3
-#define INFINITE 4
+#define LANDING 0
+#define LOGIN 1
+#define INIT 2
+#define NAV 3
+#define SP_TRIVIA 4
+#define MP_TRIVIA 5
+#define INFINITE 6
 
 const int multi_trivia_flag = 10;
 const int single_trivia_flag = 11;
@@ -30,9 +36,13 @@ CoolButton button2(BUTTON_PIN_2);
 int old_button1_flag, old_button2_flag, button1_flag, button2_flag, button1_delta, button2_delta;
 int flag;
 int state;
+boolean imu_activated;
 
 VerticalMenu menu = VerticalMenu(tft);
 TriviaGame sp_trivia;
+MPU6050 imu;
+Initialization timCreator = Initialization(tft);
+Login login = Login(tft);
 //TriviaGame mp_trivia = TriviaGame(username, network, password, tft, false);
 //InfiniteRun infinite;
 
@@ -41,6 +51,15 @@ void setup() {
   Serial.begin(115200);               // Set up serial port
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);
+
+  if (imu.setupIMU(1)) {
+    Serial.println("IMU Connected!");
+  } else {
+    Serial.println("IMU Not Connected :/");
+    Serial.println("Restarting");
+    ESP.restart(); // restart the ESP (proper way)
+  }
+  
   tft.init();
   tft.setRotation(2);
   tft.setTextSize(1);
@@ -52,9 +71,20 @@ void setup() {
   connect_to_WiFi();
   pinMode(14, OUTPUT); //controlling TFT with hardware power management
   digitalWrite(14, HIGH);
-  state = 1;
-  menu.displayHome();
+  state = LANDING;
   Serial.println("STARTING");
+  imu_activated = false;
+  
+  // Opening screen
+  tft.setTextColor(TFT_BLACK, TFT_WHITE);
+  tft.setCursor(0, tft.height()/4);
+  tft.println("double click to log in");
+  tft.setCursor(0, 2*tft.height()/4);
+  tft.println("long press to make new timagotchi");
+  tft.setCursor(0, 3*tft.height()/4);
+  tft.setTextColor(TFT_LIGHTGREY);
+  tft.println("(right button)");
+  tft.setTextColor(TFT_BLACK);
 }
 
 void loop() {
@@ -72,9 +102,26 @@ void loop() {
 
 void fsm(int b1_delta, int b2_delta) {
   switch (state) {
-    case IDLE:
-      state = NAV;
-      menu.displayHome();
+    case LANDING:
+      if (b2_delta == -3) {
+        state = LOGIN;
+      } else if (b2_delta == -2) {
+        state = INIT;
+      }
+      break;
+    case LOGIN:
+      flag = login.update(b1_delta, b2_delta);
+      if (flag != 0) {
+        state = NAV;
+        menu.displayHome();
+      }
+      break;
+    case INIT:
+      flag = timCreator.update(abs(b1_delta), abs(b2_delta));
+      if (flag != 0) {
+        state = NAV;
+        menu.displayHome();
+      }
       break;
     case NAV:
       flag = menu.update(b1_delta, b2_delta);
@@ -87,6 +134,7 @@ void fsm(int b1_delta, int b2_delta) {
         //trivia = TriviaGame(multi);
       } else if (flag == infinite_run_flag) {
         state = INFINITE;
+        imu_activated = true;
         //infinite = InfiniteRun();
       }
       break;
@@ -106,9 +154,11 @@ void fsm(int b1_delta, int b2_delta) {
       break;
     case INFINITE:
       flag = 0;
+      
       //flag = infinite.update(b1_delta, b2_delta);
       if (flag != 0 or b1_delta != 0) {
         state = NAV;
+        imu_activated = false;
         menu.displayHome();
       }
       break;

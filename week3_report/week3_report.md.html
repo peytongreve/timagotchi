@@ -6,48 +6,164 @@
 by Julian Manyika, Peyton Greve, Kyle Sandell, Brett Allen, Alex Cho and Haran Nadarajah
 
 
-# Infinite Run: game class utilizing ball and obstacle objects
+## Infinite Run: game class utilizing ball and obstacle objects
 
 **Deliverable**: The user should be able to navigate to Infinite run, and open up the game. In the game, the user presses start, and obstacles begin to go down the screen. The game just redraws the obstacles, making it look like they're coming down the screen. The spawning of obstacles should be random
 
 
 
-# Infinite Run: ball and obstacle classes
+## Infinite Run: ball and obstacle classes
 
 **Deliverable**: The ball stays at the same height on the screen, and the user tilts the device to move left or right to move it left or right. The obstacles should only have an updatable location, and won't depend on imu input.
 
 
 
-# Single Player Trivia: game class
+## Single Player Trivia: game class
 
 **Deliverable**: Create trivia game class that includes ability to answer multiple choice and true or false question. Keeps track of score using point system where as points increase so does happiness. 
 
 Similar to the Trivia Design project we have a python file on the server that parses the questions and answer from the Trivia API. We displayed this information with the question at the top followed by the answer choices. If the player chooses the correct answer a green box will highlight around the answer. The player can keep playing or long press to exit.
 
+The Trivia class utilizes elements of our previous trivia design exercise and the display strategies in the vertical menu.
+
+* While we're using the same trivia server for the trivia, the context of where the data goes and where the trivia class in c++ is located is very different.
+	* In tandem with the menu-to-menu connection goal, we had to make a finite state machine in an update function that allowed the object to signal higher system state changes
+	* An even greater challenge was making the link between the Trivia object and the Timagotchi object
+
+* While we utilized a display strategy similar to that of the VerticalMenu class, this one had to accommodate for more text and answer feedback
+	* We had to use print statements instead of drawing strings to allow for overflow
+	* we changed the margins of the cursors
+	* most significantly, we added a buzzer function, where once a user selects an answer, the selected answer and the right answer are the only answers shown on the screen:
+		* if the user is right, only their selected answer is shown with a green cursor.
+		* if the user is wrong, their selected answer remains, with the red cursor, and the correct answer remains, with a green cursor.
+
+![Trivia State Diagram](SPTriviaStateDiagram.jpg)
 
 
-# Basic login
+## Basic login
 
 **Deliverable**: user should have to enter their username every time they open up their device, or they can create a timagotchi with a new username
 
+This utilized the code from the initialization that was done in week 2, but only requires a name. It's still a work in progress. The server integration is trickier and more time intensive than I had anticipated, and will require a more integrated system to be ready before it's fully implemented. Below are some things we'll have to consider:
+
+* Since part of the point of a username is user accessibility without having to change code, should we also allow them to enter their wifi network and password?
+
+* For easier text entry, do we make a virtual keyboard where the buttons are used to toggle between and select keys?
+
+* For security, do we want to require a password for each account? Do we encrypt it? How should we do that?
+
+* An additional accessibility upgrade would be to allow the user to only have to enter their password or wifi if they haven't logged in for several days.
+
+* An even cooler accessibility upgrade would be autocomplete for usernames (if the user has logged in recently).
+
+Just some thoughts. Wasn't able to reach this deliverable, but it could end up being a pretty central part of our work going forward.
 
 
-# Hunger and Happiness meters, login key icon
+## Hunger and Happiness meters, login key icon
 
 **Deliverable**: Hunger meter on the left of the beaver icon, happiness on the right. Happiness being red, hunger being green
 
 
 
-# Connecting endpoints with timagotchi
+## Connecting endpoints with timagotchi
 
 **Deliverable**: Connect each of the menus and their various actions/server hits to work and actually update the database
 
 ![endpoints](image.jpeg)
 
 
-# Menu-to-menu connection
+## Menu-to-menu connection
 
 **Deliverable**: Connect the menus such that as soon as the user turns it on, they can get from creating a user/logging in to the main menu and between said menus
+
+An important part of menu and object integration into the larger system was modifying the update functions of each object so that they'd return useful information that would then help determine system state. We called this the *flag*
+
+* a non-zero flag is meant to indicate a system state change
+* otherwise, the state remains the same, and the current object, whether it be a game, menu, etc..., keeps taking in sensor reads and makes decisions accordingly.
+
+Here is the code for the system fsm.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void fsm(int b1_delta, int b2_delta) {
+	switch (state) {
+	  case LANDING:
+		if (b2_delta == -3) {
+		  state = LOGIN;
+		} else if (b2_delta == -2) {
+		  state = INIT;
+		}
+		break;
+	  case LOGIN:
+		flag = login.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case INIT:
+		flag = timCreator.update(abs(b1_delta), abs(b2_delta));
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case NAV:
+		flag = menu.update(b1_delta, b2_delta);
+		if (flag == single_trivia_flag) {
+		  state = SP_TRIVIA;
+		  Serial.println("Problem?");
+		  sp_trivia.initialize(username, network, password, tft, false);
+		} else if (flag == multi_trivia_flag) {
+		  state = MP_TRIVIA;
+		  //trivia = TriviaGame(multi);
+		} else if (flag == infinite_run_flag) {
+		  state = INFINITE;
+		  imu_activated = true;
+		  //infinite = InfiniteRun();
+		}
+		break;
+	  case SP_TRIVIA:
+		flag = sp_trivia.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case MP_TRIVIA:
+		//flag = mp_trivia.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case INFINITE:
+		flag = 0;
+		
+		//flag = infinite.update(b1_delta, b2_delta);
+		if (flag != 0 or b1_delta != 0) {
+		  state = NAV;
+		  imu_activated = false;
+		  menu.displayHome();
+		}
+		break;
+	}
+	if (flag != 0) {
+	  Serial.println(flag);
+	}
+	flag = 0;
+  }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Ball Class For Infinite Run
+The ball is similar to what we used in class but it is only made so that the x position moves because the y position should be constant. 
+
+The function step() is used to simulate a timestep in the game and moves the ball given a force from the imu.
+
+The function reset() is used to reset the game by setting the x_pos in the middle and x_vel back to 0
+
+## Obstacle Class for Infinite Run
+The obstacle class is used for Infinite Run and moves obstacles down the screen so that the ball has to avoid it.
+
+The function step() is used to simulate a timestep in the game and moves the obstacle down by y_vel (which stays constant)
 
 
 
