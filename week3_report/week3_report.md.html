@@ -46,6 +46,82 @@ by Julian Manyika, Peyton Greve, Kyle Sandell, Brett Allen, Alex Cho and Haran N
 
 **Deliverable**: Connect the menus such that as soon as the user turns it on, they can get from creating a user/logging in to the main menu and between said menus
 
+An important part of menu and object integration into the larger system was modifying the update functions of each object so that they'd return useful information that would then help determine system state. We called this the *flag*
+
+* a non-zero flag is meant to indicate a system state change
+* otherwise, the state remains the same, and the current object, whether it be a game, menu, etc..., keeps taking in sensor reads and makes decisions accordingly.
+
+Here is the code for the system fsm.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void fsm(int b1_delta, int b2_delta) {
+	switch (state) {
+	  case LANDING:
+		if (b2_delta == -3) {
+		  state = LOGIN;
+		} else if (b2_delta == -2) {
+		  state = INIT;
+		}
+		break;
+	  case LOGIN:
+		flag = login.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case INIT:
+		flag = timCreator.update(abs(b1_delta), abs(b2_delta));
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case NAV:
+		flag = menu.update(b1_delta, b2_delta);
+		if (flag == single_trivia_flag) {
+		  state = SP_TRIVIA;
+		  Serial.println("Problem?");
+		  sp_trivia.initialize(username, network, password, tft, false);
+		} else if (flag == multi_trivia_flag) {
+		  state = MP_TRIVIA;
+		  //trivia = TriviaGame(multi);
+		} else if (flag == infinite_run_flag) {
+		  state = INFINITE;
+		  imu_activated = true;
+		  //infinite = InfiniteRun();
+		}
+		break;
+	  case SP_TRIVIA:
+		flag = sp_trivia.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case MP_TRIVIA:
+		//flag = mp_trivia.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case INFINITE:
+		flag = 0;
+		
+		//flag = infinite.update(b1_delta, b2_delta);
+		if (flag != 0 or b1_delta != 0) {
+		  state = NAV;
+		  imu_activated = false;
+		  menu.displayHome();
+		}
+		break;
+	}
+	if (flag != 0) {
+	  Serial.println(flag);
+	}
+	flag = 0;
+  }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
