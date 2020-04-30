@@ -150,6 +150,19 @@ void fsm(int b1_delta, int b2_delta) {
   }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## Ball Class For Infinite Run
+The ball is similar to what we used in class but it is only made so that the x position moves because the y position should be constant. 
+
+The function step() is used to simulate a timestep in the game and moves the ball given a force from the imu.
+
+The function reset() is used to reset the game by setting the x_pos in the middle and x_vel back to 0
+
+## Obstacle Class for Infinite Run
+The obstacle class is used for Infinite Run and moves obstacles down the screen so that the ball has to avoid it.
+
+The function step() is used to simulate a timestep in the game and moves the obstacle down by y_vel (which stays constant)
+
+
 
 
 <!--?prettify?--></LOOP_PERIOD>
