@@ -44,7 +44,7 @@ MPU6050 imu;
 Initialization timCreator = Initialization(tft);
 Login login = Login(tft);
 //TriviaGame mp_trivia = TriviaGame(username, network, password, tft, false);
-//InfiniteRun infinite;
+InfiniteRun infinite(tft, username, network, password, imu);
 
 void setup() {
   // put your setup code here, to run once:
@@ -74,7 +74,13 @@ void setup() {
   state = LANDING;
   Serial.println("STARTING");
   imu_activated = false;
-  
+  if (imu.setupIMU(1)) {
+      Serial.println("IMU Connected!");
+    } else {
+      Serial.println("IMU Not Connected :/");
+      Serial.println("Restarting");
+      ESP.restart(); // restart the ESP (proper way)
+    }
   tft.fillScreen(TFT_WHITE);
   tft.setTextColor(TFT_BLACK);
   tft.setTextDatum(TC_DATUM);
@@ -139,7 +145,7 @@ void fsm(int b1_delta, int b2_delta) {
       } else if (flag == infinite_run_flag) {
         state = INFINITE;
         imu_activated = true;
-        //infinite = InfiniteRun();
+        infinite = InfiniteRun(tft, username, network, password, imu);
       }
       break;
     case SP_TRIVIA:
@@ -158,7 +164,7 @@ void fsm(int b1_delta, int b2_delta) {
       break;
     case INFINITE:
       flag = 0;
-      
+      infinite.step();
       //flag = infinite.update(b1_delta, b2_delta);
       if (flag != 0 or b1_delta != 0) {
         state = NAV;
