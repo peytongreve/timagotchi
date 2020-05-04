@@ -16,7 +16,7 @@ InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password
     tft = tftESP;
     imu = imu_arg;
     ball_x_pos = tftESP.width()/2;
-    ball_Y_POS = tftESP.height()*(3/4);
+    ball_Y_POS = 100;
     ball_x_vel = 0;
     ball_x_accel = 0;
     BALL_CLR = TFT_RED; // colors for ball and background
@@ -31,7 +31,7 @@ InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password
     obstacle_y_pos = 0;
     obstacle_y_vel = 0.01; // delta y (must be positive)
     OBSTACLE_CLR = TFT_BLACK;
-    WIDTH = 10;
+    WIDTH = 25;
     HEIGHT = 5;
     BOTTOM_LIMIT = tftESP.height() - HEIGHT;
 }
@@ -40,13 +40,16 @@ void InfiniteRun::step() {
     switch (state) {
         case START:
             ballReset();
+            ballStep(10); // get ball moving
             state = PLAYING;
             current_score = 0;
             break;
         case PLAYING:
             // float x = -imu.accelCount[1] * imu.aRes;
+            // Serial.println(imu.accelCount[1]);
             ballStep(-imu.accelCount[1] * imu.aRes * 1000);
             obstacleStep();
+            // Serial.println(ball_x_pos);
             // check for collision
             // else current_score += 1
             if (checkForCollision()) {
@@ -68,9 +71,9 @@ void InfiniteRun::step() {
 void InfiniteRun::ballStep(float x_force) {
     ball_x_accel = x_force/MASS;
     ball_x_vel = ball_x_vel + 0.001*DT*ball_x_accel;
-    tft.drawCircle(ball_x_pos, ball_Y_POS, RADIUS, BKGND_CLR);
+    tft.fillCircle(ball_x_pos, ball_Y_POS, RADIUS, BKGND_CLR);
     moveBall();
-    tft.drawCircle(ball_x_pos, ball_Y_POS, RADIUS, BALL_CLR);
+    tft.fillCircle(ball_x_pos, ball_Y_POS, RADIUS, BALL_CLR);
 }
 
 void InfiniteRun::moveBall() {

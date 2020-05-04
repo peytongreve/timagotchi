@@ -24,8 +24,10 @@ const int multi_trivia_flag = 10;
 const int single_trivia_flag = 11;
 const int infinite_run_flag = 30;
 
-char * network = "kumba20";
-char * password = "yekumba20!";
+// char * network = "kumba20";
+// char * password = "yekumba20!";
+char* network = "Homebase";
+char* password = "StevenEdgar";
 char * username = "julian";
 
 const int BUTTON_PIN_1 = 16;
@@ -53,13 +55,13 @@ void setup() {
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);
 
-  if (imu.setupIMU(1)) {
-    Serial.println("IMU Connected!");
-  } else {
-    Serial.println("IMU Not Connected :/");
-    Serial.println("Restarting");
-    ESP.restart(); // restart the ESP (proper way)
-  }
+//  if (imu.setupIMU(1)) {
+//    Serial.println("IMU Connected!");
+//  } else {
+//    Serial.println("IMU Not Connected :/");
+//    Serial.println("Restarting");
+//    ESP.restart(); // restart the ESP (proper way)
+//  }
   
   tft.init();
   tft.setRotation(2);
@@ -148,6 +150,7 @@ void fsm(int b1_delta, int b2_delta) {
         imu_activated = true;
         tft.fillScreen(TFT_WHITE);
         infinite = InfiniteRun(tft, username, network, password, imu);
+        infinite.step();
       }
       break;
     case SP_TRIVIA:
@@ -166,6 +169,8 @@ void fsm(int b1_delta, int b2_delta) {
       break;
     case INFINITE:
       flag = 0;
+      // float timer = millis();
+      // while (millis() - timer < 1000);
       infinite.step();
       //flag = infinite.update(b1_delta, b2_delta);
       if (flag != 0 or b1_delta != 0) {
