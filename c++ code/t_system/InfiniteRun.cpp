@@ -6,6 +6,7 @@
 #include <WiFi.h>
 #include <stdlib.h>
 #include <mpu6050_esp32.h>
+#include <time.h>
 
 InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password, MPU6050 imu_arg) {
     state = 0;
@@ -104,6 +105,9 @@ void InfiniteRun::obstacleStep() {
     if (obstacle_y_pos + obstacle_y_vel > BOTTOM_LIMIT) {
         // remove the obstacle
         tft.fillRect(obstacle_X_POS, obstacle_y_pos, WIDTH, HEIGHT, BKGND_CLR);
+        // add new one
+        obstacle_X_POS = rand() % 40 + 1; // random number
+        obstacle_y_pos = 0;
     } else {
         tft.fillRect(obstacle_X_POS, obstacle_y_pos, WIDTH, HEIGHT, BKGND_CLR);
         obstacle_y_pos += obstacle_y_vel;
