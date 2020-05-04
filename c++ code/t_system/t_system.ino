@@ -24,8 +24,8 @@ const int multi_trivia_flag = 10;
 const int single_trivia_flag = 11;
 const int infinite_run_flag = 30;
 
-char * network = "kumba17";
-char * password = "jsjnetworkyekumba17";
+char * network = "kumba20";
+char * password = "yekumba20!";
 char * username = "julian";
 
 const int BUTTON_PIN_1 = 16;
@@ -146,6 +146,7 @@ void fsm(int b1_delta, int b2_delta) {
       } else if (flag == infinite_run_flag) {
         state = INFINITE;
         imu_activated = true;
+        tft.fillScreen(TFT_WHITE);
         infinite = InfiniteRun(tft, username, network, password, imu);
       }
       break;

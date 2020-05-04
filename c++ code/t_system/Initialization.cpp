@@ -20,8 +20,8 @@ int course_num = 1;
 //Timagotchi tim;
 bool draw = true;
 
-char netw[] = "TheAllens2.4";  //SSID CHANGE!!
-char passw[] = "magnolia"; //passw for WiFi CHANGE!!!
+char netw[] = "kumba20";  //SSID CHANGE!!
+char passw[] = "yekumba20!"; //passw for WiFi CHANGE!!!
 char hos[] = "608dev-2.net";
 
 //Some constants and some resources:

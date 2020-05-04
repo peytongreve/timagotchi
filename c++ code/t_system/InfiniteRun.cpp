@@ -28,7 +28,7 @@ InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password
     DT = 25; // loop speed
     obstacle_X_POS = 0; // starting x
     obstacle_y_pos = 0;
-    obstacle_y_vel = 5; // delta y (must be positive)
+    obstacle_y_vel = 0.01; // delta y (must be positive)
     OBSTACLE_CLR = TFT_BLACK;
     WIDTH = 10;
     HEIGHT = 5;
@@ -106,7 +106,7 @@ void InfiniteRun::obstacleStep() {
         // remove the obstacle
         tft.fillRect(obstacle_X_POS, obstacle_y_pos, WIDTH, HEIGHT, BKGND_CLR);
         // add new one
-        obstacle_X_POS = rand() % 40 + 1; // random number
+        obstacle_X_POS = rand() % tft.width(); // random number
         obstacle_y_pos = 0;
     } else {
         tft.fillRect(obstacle_X_POS, obstacle_y_pos, WIDTH, HEIGHT, BKGND_CLR);

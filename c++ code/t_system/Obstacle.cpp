@@ -5,7 +5,7 @@
 Obstacle::Obstacle(TFT_eSPI tftESP, float x) {
     X_POS = x; // starting x
     y_pos = 0;
-    y_vel = 5; // delta y (must be positive)
+    y_vel = 1; // delta y (must be positive)
     OBSTACLE_CLR = TFT_BLACK;
     BKGND_CLR = TFT_WHITE;
     WIDTH = 10;

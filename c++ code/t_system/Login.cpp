@@ -4,8 +4,8 @@
 #include <WiFi.h> //Connect to WiFi netw
 
 char login_response[OUT_BUFFER_SIZE]; //char array buffer to hold HTTP request
-char ntw[] = "kumba17";  //SSID CHANGE!!
-char pwd[] = "jsjnetworkyekumba17"; //passw for WiFi CHANGE!!!
+char ntw[] = "kumba20";  //SSID CHANGE!!
+char pwd[] = "yekumba20!"; //passw for WiFi CHANGE!!!
 char hst[] = "608dev-2.net";
 
 Login::Login(TFT_eSPI tftESP) {

@@ -4,7 +4,7 @@
 
 Ball::Ball(TFT_eSPI tftESP) {
     x_pos = tftESP.width()/2;
-    Y_POS = (3/4)*tftESP.height();
+    Y_POS = 0;
     x_vel = 0;
     x_accel = 0;
     BALL_CLR = TFT_RED; // colors for ball and background
