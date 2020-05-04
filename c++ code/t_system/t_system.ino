@@ -3,6 +3,7 @@
 #include "TriviaGame.h"
 #include "Initialization.h"
 #include "Login.h"
+#include "InfiniteRun.h"
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <WiFi.h> //Connect to WiFi Network
@@ -44,7 +45,7 @@ MPU6050 imu;
 Initialization timCreator = Initialization(tft);
 Login login = Login(tft);
 //TriviaGame mp_trivia = TriviaGame(username, network, password, tft, false);
-InfiniteRun infinite(tft, username, network, password, imu);
+InfiniteRun infinite = InfiniteRun(tft, username, network, password, imu);
 
 void setup() {
   // put your setup code here, to run once:

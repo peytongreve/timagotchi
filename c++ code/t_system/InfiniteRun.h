@@ -21,16 +21,37 @@ class InfiniteRun {
     int current_score;
     // Ball ball;
     // Obstacle obstacle;
-    Ball ball(TFT_eSPI);
-    Obstacle obstacle(TFT_eSPI, int);
     MPU6050 imu;
+    float ball_x_pos;
+    float ball_Y_POS;
+    float ball_x_vel;
+    float ball_x_accel;
+    int BALL_CLR;
+    int BKGND_CLR;
+    int MASS;
+    int RADIUS;
+    int LEFT_LIMIT;
+    int RIGHT_LIMIT;
+    float K_SPRING;
+    int DT;
+    float obstacle_X_POS; // starting point of obstacle
+    float obstacle_y_pos;
+    float obstacle_y_vel;
+    int OBSTACLE_CLR;
+    int WIDTH;
+    int HEIGHT;
+    int BOTTOM_LIMIT;
 
     public:
         InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password, MPU6050 imu_arg);
         void step();
+        void obstacleStep();
+        void ballStep(float x_force);
+        void ballReset();
     private:
         void postScore();
         bool checkForCollision();
+        void moveBall();
 };
 
 #endif

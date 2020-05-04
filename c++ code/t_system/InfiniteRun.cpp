@@ -7,29 +7,44 @@
 #include <stdlib.h>
 #include <mpu6050_esp32.h>
 
-InfiniteRun::InfiniteRun(TFT_eSPI* tftESP, char* user, char* wifi, char* password, MPU6050 imu_arg) {
+InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password, MPU6050 imu_arg) {
     state = 0;
     username = user;
     wifi_name = wifi;
     wifi_password = password;
     tft = tftESP;
     imu = imu_arg;
-    ball = Ball(tftESP);
-    // obstacle = new Obstacle(tft, 0); // first obstacle is at x = 0
+    ball_x_pos = tftESP.width()/2;
+    ball_x_vel = 0;
+    ball_x_accel = 0;
+    BALL_CLR = TFT_RED; // colors for ball and background
+    BKGND_CLR = TFT_WHITE;
+    MASS = 1;
+    RADIUS = 4;
+    LEFT_LIMIT = RADIUS;
+    RIGHT_LIMIT = tftESP.width() - RADIUS;
+    K_SPRING = 0.9; // spring coefficient
+    DT = 25; // loop speed
+    obstacle_X_POS = 0; // starting x
+    obstacle_y_pos = 0;
+    obstacle_y_vel = 5; // delta y (must be positive)
+    OBSTACLE_CLR = TFT_BLACK;
+    WIDTH = 10;
+    HEIGHT = 5;
+    BOTTOM_LIMIT = tftESP.height() - HEIGHT;
 }
 
-InfiniteRun::step() {
+void InfiniteRun::step() {
     switch (state) {
         case START:
-            ball.reset();
+            ballReset();
             state = PLAYING;
-            obstacle = new Obstacle(tft, 0);
             current_score = 0;
             break;
         case PLAYING:
-            float x = -imu.accelCount[1] * imu.aRes
-            ball.step(x * 1000);
-            obstacle.step();
+            // float x = -imu.accelCount[1] * imu.aRes;
+            ballStep(-imu.accelCount[1] * imu.aRes * 1000);
+            obstacleStep();
             // check for collision
             // else current_score += 1
             if (checkForCollision()) {
@@ -48,28 +63,76 @@ InfiniteRun::step() {
     }
 }
 
-InfiniteRun::checkForCollision() {
-    int min_x = obstacle.X_POS;
-    int max_x = obstacle.X_POS + width;
-    int min_y = obstacle.y_pos;
-    int max_y = obstacle.y_pos + height;
+void InfiniteRun::ballStep(float x_force) {
+    ball_x_accel = x_force/MASS;
+    ball_x_vel = ball_x_vel + 0.001*DT*ball_x_accel;
+    tft.drawCircle(ball_x_pos, ball_Y_POS, RADIUS, BKGND_CLR);
+    moveBall();
+    tft.drawCircle(ball_x_pos, ball_Y_POS, RADIUS, BALL_CLR);
+}
 
-    int left = ball.x_pos - ball.RADIUS;
-    int right = ball.x_pos + ball.RADIUS;
+void InfiniteRun::moveBall() {
+    float x_move = 0.001*DT*ball_x_vel;
+    if (ball_x_pos + x_move > RIGHT_LIMIT) {
+      if (x_move - 2*(RIGHT_LIMIT - ball_x_pos) > 0) {
+        x_move -= 2*(RIGHT_LIMIT - ball_x_pos);
+      } else {
+        x_move -= RIGHT_LIMIT - ball_x_pos;
+        ball_x_pos = RIGHT_LIMIT;
+      }
+      x_move *= -K_SPRING;
+      ball_x_vel *= -K_SPRING;
+    } else if (ball_x_pos + x_move < LEFT_LIMIT) {
+      if (x_move - 2*(ball_x_pos - LEFT_LIMIT) > 0) {
+        x_move -= 2*(ball_x_pos - LEFT_LIMIT);
+      } else {
+        x_move -= ball_x_pos - LEFT_LIMIT;
+        ball_x_pos = LEFT_LIMIT;
+      }
+      x_move *= -K_SPRING;
+      ball_x_vel *= -K_SPRING;
+    }
+    ball_x_pos += x_move;
+}
 
-    if (ball.x_pos > min_x && ball.x_pos < max_x && 
-            ball.Y_POS > min_y && ball.Y_POS < max_y) { // middle
+void InfiniteRun::ballReset() {
+    ball_x_pos = tft.width() / 2;
+    ball_x_vel = 0;
+}
+
+void InfiniteRun::obstacleStep() {
+    if (obstacle_y_pos + obstacle_y_vel > BOTTOM_LIMIT) {
+        // remove the obstacle
+        tft.fillRect(obstacle_X_POS, obstacle_y_pos, WIDTH, HEIGHT, BKGND_CLR);
+    } else {
+        tft.fillRect(obstacle_X_POS, obstacle_y_pos, WIDTH, HEIGHT, BKGND_CLR);
+        obstacle_y_pos += obstacle_y_vel;
+        tft.fillRect(obstacle_X_POS, obstacle_y_pos, WIDTH, HEIGHT, OBSTACLE_CLR);
+    }
+}
+
+bool InfiniteRun::checkForCollision() {
+    int min_x = obstacle_X_POS;
+    int max_x = obstacle_X_POS + WIDTH;
+    int min_y = obstacle_y_pos;
+    int max_y = obstacle_y_pos + HEIGHT;
+
+    int left = ball_x_pos - RADIUS;
+    int right = ball_x_pos + RADIUS;
+
+    if (ball_x_pos > min_x && ball_x_pos < max_x && 
+            ball_Y_POS > min_y && ball_Y_POS < max_y) { // middle
         return true;
     } else if (left > min_x && left < max_x && 
-            ball.Y_POS > min_y && ball.Y_POS < max_y) { // left edge
+            ball_Y_POS > min_y && ball_Y_POS < max_y) { // left edge
         return true;
     } else if (right > min_x && right < max_x && 
-            ball.Y_POS > min_y && ball.Y_POS < max_y) { // right edge
+            ball_Y_POS > min_y && ball_Y_POS < max_y) { // right edge
         return true;
     }
     return false;
 }
 
-InfiniteRun::postScore() {
+void InfiniteRun::postScore() {
     // post the `highest_score` to server for `username`
 }
