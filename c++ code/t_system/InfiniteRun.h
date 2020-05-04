@@ -44,7 +44,7 @@ class InfiniteRun {
 
     public:
         InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password, MPU6050 imu_arg);
-        void step();
+        void step(float x_force);
         void obstacleStep();
         void ballStep(float x_force);
         void ballReset();
