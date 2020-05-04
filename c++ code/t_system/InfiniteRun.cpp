@@ -16,6 +16,7 @@ InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password
     tft = tftESP;
     imu = imu_arg;
     ball_x_pos = tftESP.width()/2;
+    ball_Y_POS = tftESP.height()*(3/4);
     ball_x_vel = 0;
     ball_x_accel = 0;
     BALL_CLR = TFT_RED; // colors for ball and background
