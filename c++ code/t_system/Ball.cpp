@@ -1,10 +1,8 @@
 #include "Ball.h"
 #include <SPI.h>
 #include <TFT_eSPI.h>
-#include <mpu6050_esp32.h>
 
-Ball::Ball(TFT_eSPI tftESP, MPU6050 imu_arg) {
-    imu = imu_arg;
+Ball::Ball(TFT_eSPI tftESP) {
     x_pos = tftESP.width()/2;
     Y_POS = (3/4)*tftESP.height();
     x_vel = 0;

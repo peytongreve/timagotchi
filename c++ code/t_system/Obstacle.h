@@ -18,6 +18,7 @@ class Obstacle {
       Obstacle(TFT_eSPI tftESP, float x);
       Obstacle(TFT_eSPI tftESP, float x, float vel, int length, int height);
       void step();
+      void clear();
 };
 
 #endif

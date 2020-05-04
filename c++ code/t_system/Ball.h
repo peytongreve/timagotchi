@@ -2,12 +2,9 @@
 #define Ball_h
 #include <SPI.h>
 #include <TFT_eSPI.h>
-#include <mpu6050_esp32.h>
 
 class Ball 
 {
-    
-    MPU6050 imu; //imu object called, appropriately, imu
     float x_pos;
     float Y_POS;
     float x_vel;
@@ -23,7 +20,7 @@ class Ball
     TFT_eSPI tft;
 
     public:
-        Ball(TFT_eSPI tftESP, MPU6050 imu_arg);
+        Ball(TFT_eSPI tftESP);
         void step(float x_force);
         void reset();
         void moveBall();

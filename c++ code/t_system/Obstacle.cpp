@@ -36,3 +36,7 @@ void Obstacle::step() { // call this every time step
         tft.fillRect(X_POS, y_pos, WIDTH, HEIGHT, OBSTACLE_CLR);
     }
 }
+
+void Obstacle::clear() {
+    tft.fillRect(X_POS, y_pos, WIDTH, HEIGHT, BKGND_CLR);
+}
