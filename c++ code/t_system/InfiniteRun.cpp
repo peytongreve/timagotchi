@@ -25,29 +25,30 @@ InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password
     RADIUS = 4;
     LEFT_LIMIT = RADIUS;
     RIGHT_LIMIT = tftESP.width() - RADIUS;
-    K_SPRING = 0.9; // spring coefficient
+    K_SPRING = 0.1; // spring coefficient
     DT = 25; // loop speed
     obstacle_X_POS = 0; // starting x
     obstacle_y_pos = 0;
-    obstacle_y_vel = 0.01; // delta y (must be positive)
+    obstacle_y_vel = 0.07; // delta y (must be positive)
     OBSTACLE_CLR = TFT_BLACK;
     WIDTH = 25;
     HEIGHT = 5;
     BOTTOM_LIMIT = tftESP.height() - HEIGHT;
 }
 
-void InfiniteRun::step() {
+void InfiniteRun::step(float x_force) {
     switch (state) {
         case START:
             ballReset();
-            ballStep(10); // get ball moving
+            ballStep(x_force); // get ball moving
             state = PLAYING;
             current_score = 0;
             break;
         case PLAYING:
             // float x = -imu.accelCount[1] * imu.aRes;
             // Serial.println(imu.accelCount[1]);
-            ballStep(-imu.accelCount[1] * imu.aRes * 1000);
+            // ballStep(-imu.accelCount[1] * imu.aRes * 1000);
+            ballStep(x_force);
             obstacleStep();
             // Serial.println(ball_x_pos);
             // check for collision

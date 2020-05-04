@@ -150,7 +150,7 @@ void fsm(int b1_delta, int b2_delta) {
         imu_activated = true;
         tft.fillScreen(TFT_WHITE);
         infinite = InfiniteRun(tft, username, network, password, imu);
-        infinite.step();
+        infinite.step(10);
       }
       break;
     case SP_TRIVIA:
@@ -171,7 +171,8 @@ void fsm(int b1_delta, int b2_delta) {
       flag = 0;
       // float timer = millis();
       // while (millis() - timer < 1000);
-      infinite.step();
+      imu.readAccelData(imu.accelCount);
+      infinite.step(float(-imu.accelCount[1] * imu.aRes) * 10);
       //flag = infinite.update(b1_delta, b2_delta);
       if (flag != 0 or b1_delta != 0) {
         state = NAV;
