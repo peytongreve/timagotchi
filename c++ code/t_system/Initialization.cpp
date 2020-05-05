@@ -6,7 +6,8 @@
 
 #define START 0
 #define NAME 1
-#define COURSE 2
+#define CHECK 2
+#define COURSE 3
 #define END 4
 #define MAINMENU 5
 
@@ -19,10 +20,11 @@ char prompt[100];
 int course_num = 1;
 //Timagotchi tim;
 bool draw = true;
+bool check = false;
 
 char netw[] = "kumba20";  //SSID CHANGE!!
 char passw[] = "yekumba20!"; //passw for WiFi CHANGE!!!
-char hos[] = "608dev-2.net";
+char hos[] = "756bdc48.ngrok.io";
 
 //Some constants and some resources:
 const int RESPONSE_TIMEOUT = 6000; //ms to wait for response from hos
@@ -61,12 +63,48 @@ int Initialization::update(int b1_flag, int b2_flag){
         init_username[user_index] = letters[letter_index];
         user_index = user_index + 1;
         if(user_index == 10){
+          state = CHECK;
+          check = true;
+          draw = false;
+        }
+        else{
+          draw = true;
+        }
+      }
+      else if(b1_flag == 1){
+        state = CHECK;
+        check = true;
+        draw = false;
+      }
+      break;
+    case CHECK:
+      if(check){
+        char thing[30];
+        char request[500];
+        sprintf(request, "GET /timagochi_exists?name=%s HTTP/1.1\r\n", init_username);
+        sprintf(request + strlen(request), "Host: %s\r\n", hos);
+        strcat(request, "Content-Type: application/x-www-form-urlencoded\r\n");
+        sprintf(request + strlen(request), "Content-Length: %d\r\n\r\n", strlen(thing));
+        strcat(request, thing);
+        do_http_request(hos, request, response, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
+        Serial.println(response);
+        check = false;
+        if(response[0] == 'f'){
           state = COURSE;
         }
         draw = true;
       }
-      else if(b1_flag == 1){
-        state = COURSE;
+      else if(draw){
+        drawCheck();
+        draw = false;
+      }
+      if(b2_flag == 1 || b1_flag == 1){
+        for(int i = 0; i < 10; i++){
+          init_username[i] = 0;
+        }
+        user_index = 0;
+        letter_index = 0;
+        state = NAME;
         draw = true;
       }
       break;
@@ -90,7 +128,7 @@ int Initialization::update(int b1_flag, int b2_flag){
         char thing[30];
         sprintf(thing, "name=%s&major=%d", init_username, course_num);
         char request[500];
-        sprintf(request, "POST /sandbox/sc/team063/timagochi/create_timagochi.py? HTTP/1.1\r\n");
+        sprintf(request, "POST /get_timagochi? HTTP/1.1\r\n");
         sprintf(request + strlen(request), "Host: %s\r\n", hos);
         strcat(request, "Content-Type: application/x-www-form-urlencoded\r\n");
         sprintf(request + strlen(request), "Content-Length: %d\r\n\r\n", strlen(thing));
@@ -166,6 +204,18 @@ void Initialization::drawEnd(){
   tft.drawString("Press any button to", tft.width()/2, tft.height()/2, 1);
   tft.drawString("go to main menu!", tft.width()/2, tft.height()/2+10, 1);
 }
+
+void Initialization::drawCheck(){
+  tft.fillScreen(TFT_WHITE);
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextSize(1.8);
+  tft.drawString("Sorry, that username", tft.width()/2, tft.height()/2-30, 1);
+  tft.drawString("is already in use.", tft.width()/2, tft.height()/2-20, 1);
+  tft.drawString("Press any button to", tft.width()/2, tft.height()/2, 1);
+  tft.drawString("create new!", tft.width()/2, tft.height()/2+10, 1);
+}
+
 
 void Initialization::drawMainMenu(){
   tft.fillScreen(TFT_WHITE);
