@@ -5,9 +5,8 @@
 
 #define START 0
 #define NAME 1
-#define COURSE 2
-#define END 4
-#define MAINMENU
+#define END 2
+#define DNE 3
 
 const int RESPONSE_TIMEOUT = 6000; //ms to wait for response from hos
 const uint16_t OUT_BUFFER_SIZE = 1000; //size of buffer to hold HTTP response
@@ -15,6 +14,7 @@ const uint16_t OUT_BUFFER_SIZE = 1000; //size of buffer to hold HTTP response
 class Login
 {
   private:
+  //char * username_pointer;
   uint8_t state;
   uint8_t flag;
   TFT_eSPI tft;

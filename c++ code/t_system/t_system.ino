@@ -24,10 +24,10 @@ const int multi_trivia_flag = 10;
 const int single_trivia_flag = 11;
 const int infinite_run_flag = 30;
 
-// char * network = "kumba20";
-// char * password = "yekumba20!";
-char* network = "Homebase";
-char* password = "StevenEdgar";
+ char * network = "kumba20";
+ char * password = "yekumba20!";
+//char* network = "Homebase";
+//char* password = "StevenEdgar";
 char * username = "julian";
 
 const int BUTTON_PIN_1 = 16;
@@ -84,16 +84,7 @@ void setup() {
       Serial.println("Restarting");
       ESP.restart(); // restart the ESP (proper way)
     }
-  tft.fillScreen(TFT_WHITE);
-  tft.setTextColor(TFT_BLACK);
-  tft.setTextDatum(TC_DATUM);
-  tft.setTextSize(1.8);
-  tft.drawString("Welcome to Timagochi!", tft.width()/2, tft.height()/2-60, 1);
-  tft.drawString("Click left button to", tft.width()/2, tft.height()/2-40, 1);
-  tft.drawString("log in!", tft.width()/2, tft.height()/2-30, 1);
-  tft.drawString("Click right button to", tft.width()/2, tft.height()/2-10, 1);
-  tft.drawString("create new!", tft.width()/2, tft.height()/2, 1);
-  tft.drawString("Enjoy!", tft.width()/2, tft.height()/2+20, 1);
+  drawLandingScreen();
 }
 
 void loop() {
@@ -124,9 +115,12 @@ void fsm(int b1_delta, int b2_delta) {
       break;
     case LOGIN:
       flag = login.update(b1_delta, b2_delta);
-      if (flag != 0) {
+      if (flag == 1) {
         state = NAV;
         menu.displayHome();
+      } else if (flag == 2) {
+        state = LANDING;
+        drawLandingScreen();
       }
       break;
     case INIT:
@@ -185,6 +179,19 @@ void fsm(int b1_delta, int b2_delta) {
     Serial.println(flag);
   }
   flag = 0;
+}
+
+void drawLandingScreen() {
+  tft.fillScreen(TFT_WHITE);
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextSize(1.8);
+  tft.drawString("Welcome to Timagochi!", tft.width()/2, tft.height()/2-60, 1);
+  tft.drawString("Click left button to", tft.width()/2, tft.height()/2-40, 1);
+  tft.drawString("log in!", tft.width()/2, tft.height()/2-30, 1);
+  tft.drawString("Click right button to", tft.width()/2, tft.height()/2-10, 1);
+  tft.drawString("create new!", tft.width()/2, tft.height()/2, 1);
+  tft.drawString("Enjoy!", tft.width()/2, tft.height()/2+20, 1);
 }
 
 ////////////////////////////////////////////////////////////////////

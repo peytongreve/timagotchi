@@ -6,7 +6,8 @@
 char login_response[OUT_BUFFER_SIZE]; //char array buffer to hold HTTP request
 char ntw[] = "kumba20";  //SSID CHANGE!!
 char pwd[] = "yekumba20!"; //passw for WiFi CHANGE!!!
-char hst[] = "608dev-2.net";
+char hst[] = "756bdc48.ngrok.io";
+char letter[10];
 
 Login::Login(TFT_eSPI tftESP) {
   state = START;
@@ -33,43 +34,82 @@ int Login::update(int b1_delta, int b2_delta) {
         drawName();
         draw = false;
       }
-      if(b2_delta == 1){
+      if(b2_delta == -1){
         letter_index = (letter_index + 1)%26;
         draw = true;
+      } else if (b1_delta == -1) {
+        if (letter_index > 0) {
+          letter_index--;
+        } else {
+          letter_index = 25-abs(letter_index);
+        }
+        draw = true;
       }
-      else if(b2_delta == 3){
+      else if(b2_delta == -3){
         login_username[user_index] = letters[letter_index];
         user_index = user_index + 1;
-        if(user_index == 10){
+        if(user_index == 10) {
           state = END;
         }
         draw = true;
       }
-      else if(b1_delta == 1){
+      else if(b2_delta == -2){
         state = END;
         draw = true;
+      } else if (b1_delta == -3) {
+        memset(login_username, 0, 11);
+        draw = true;
+        user_index = 0;
+        letter_index = 0;
+      } else if (b1_delta == -2) {
+        flag = 2;
       }
       break;
     case END:
       if(draw){
-//        char thing[30];
-//        sprintf(thing, "name=%s", username);
-//        char request[500];
-//        sprintf(request, "POST /sandbox/sc/team063/timagochi/create_timagochi.py? HTTP/1.1\r\n");
-//        sprintf(request + strlen(request), "Host: %s\r\n", hos);
-//        strcat(request, "Content-Type: application/x-www-form-urlencoded\r\n");
-//        sprintf(request + strlen(request), "Content-Length: %d\r\n\r\n", strlen(thing));
-//        strcat(request, thing);
-//        do_http_request(hos, request, login_response, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
-//        Serial.println(login_response);
-        drawEnd();
+        char thing[30];
+        char request[500];
+        sprintf(request, "GET /timagochi_exists?name=%s HTTP/1.1\r\n", login_username);
+        sprintf(request + strlen(request), "Host: %s\r\n", hst);
+        strcat(request, "Content-Type: application/x-www-form-urlencoded\r\n");
+        sprintf(request + strlen(request), "Content-Length: %d\r\n\r\n", strlen(thing));
+        strcat(request, thing);
+        do_http_request(hst, request, login_response, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
+        Serial.println(login_response);
+        draw = false;
+        if(login_response[0] == 'f'){
+          Serial.println("username doesn't exist");
+          state = DNE;
+          tft.fillScreen(TFT_WHITE);
+          tft.setTextSize(1);
+          tft.setTextColor(TFT_RED);
+          tft.drawString("username not found :(", tft.width()/2, tft.height()/3);
+          tft.setTextSize(1);
+          tft.drawString("press LB to go BACK / press RB to try again", tft.width()/2, (2*tft.height())/3);
+        } else {
+          flag = 1;
+          drawEnd();
+        }
         draw = false;
       }
-      else if (b2_delta != 0 || b2_delta != 0){
+      else if (b1_delta == -2){
         state = START;
         draw = true;
       }
-      flag = 1;
+      break;
+    case DNE:
+      if (b1_delta != 0) {
+        Serial.println("issue");
+        state = START;
+        drawStart();
+        draw = false;
+      } else if (b2_delta != 0) {
+        state = NAME;
+        memset(login_username, 0, 11);
+        user_index = 0;
+        letter_index = 0;
+        draw = true;
+      }
       break;
   }
   return flag;
@@ -87,19 +127,24 @@ void Login::drawStart(){
 
 void Login::drawName(){
   tft.fillScreen(TFT_WHITE);
-  tft.setTextColor(TFT_BLACK);
+  tft.setTextColor(TFT_LIGHTGREY);
+  tft.setTextSize(0.5);
+  tft.drawString("LB long to go BACK", tft.width()/2, 0);
+  tft.drawString("LB double to clear", tft.width()/2, 10);
+  tft.drawString("RB long to ENTER", tft.width()/2, 20);
+  tft.drawString("RB double to choose", tft.width()/2, 30);
+  tft.setTextSize(1.5);
+  if (letter_index > 0) tft.drawChar(letters[letter_index-1], 10, (3*tft.height())/4);
+  if (letter_index < 25) tft.drawChar(letters[letter_index+1], tft.width()-10, (3*tft.height())/4);
+  tft.drawString("Username:", tft.width()/2, tft.height()/3);
+  
   tft.setTextDatum(TC_DATUM);
-  tft.setTextSize(1.8);
-  tft.drawString("Make your username!", tft.width()/2, tft.height()/2-60, 1);
-  tft.drawString("Click right button to", tft.width()/2, tft.height()/2-40, 1);
-  tft.drawString("choose a new letter", tft.width()/2, tft.height()/2-30, 1);
-  tft.drawString("Double click right", tft.width()/2, tft.height()/2-10, 1);
-  tft.drawString("to confirm letter", tft.width()/2, tft.height()/2, 1);
-  tft.drawString("Click left button", tft.width()/2, tft.height()/2+20, 1);
-  tft.drawString("to move on", tft.width()/2, tft.height()/2+30, 1);
-  sprintf(prompt, "Currently choosing: %c", letters[letter_index]);
-  tft.drawString(prompt, tft.width()/2, tft.height()/2+50, 1);
-  tft.drawString(login_username, tft.width()/2, tft.height()/2+60, 1);
+  tft.setTextColor(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.drawString(login_username, tft.width()/2, tft.height()/2, 1);
+  tft.setTextColor(TFT_BLUE);
+  tft.drawChar(letters[letter_index], tft.width()/2, (3*tft.height())/4, 1);
+  
 }
 
 void Login::drawEnd(){
