@@ -1,0 +1,63 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-"><link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/apidoc.css?">
+
+						  **Week 3 Report**
+
+
+by Julian Manyika, Peyton Greve, Kyle Sandell, Brett Allen, Alex Cho and Haran Nadarajah
+
+## Single Player Trivia (Haran)
+
+	Infrastructure for a single player trivia game has been built and is operational, however, the Trivia API we were given to use was dismantled by the owner in the last couple of days meaning the game is not fully functional. We created a filler demonstration to show how the game would normally work. 
+
+## Infinite Run Game (Peyton)
+
+Infinite Run is now playable where we keep track on the top score and there is one obstacle on the scream at a time.
+
+![Infinite Run](https://youtu.be/gDW15VNBhBo)
+
+
+## Infinite Run Server Interaction (Brett, Alex)
+
+Allow the user to upload their top score to the server, displaying to all other users that they are better than. Keep track of all the top scores inside the server (show server code)
+
+See video in drive
+
+
+## Multiplayer Trivia (Kyle, Haran)
+
+	We worked the structure of the Trivia API in order to get all the GET requests working only to have the API disabled. Because of this we did not pursue building the Multiplayer trivia architecture. The structure would have been very similar to the single player but there was no use in building it without a functioning API.
+
+## Login (Julian)
+
+Similar to the initialization class made by Brett, the login class simply gets user input for a username and checks whether or not it exists in the database.
+
+The key differences in the login page are in its accessibility and UX:
+
+* Two-way scrolling keyboard: Simply put, the user can scroll left or right through the alphabet using single left or right button presses. Additionally, the user can see the next and previous letter, since the alphabet can be hard sometimes
+* Error Screen: if the username isn’t found, the user is given a prompt asking if they’d like to try again
+* Clear: The user can clear the username that they just typed by double clicking the left button.
+* Exit: The user can, at any time, return to the starting “Welcome” page by long pressing the left button.
+
+While these features might not even deserve all this attention, they’re important since they take user tendencies into account, which is very important since this is the system’s bottleneck; every user has to sign in. 
+
+![Login](https://youtu.be/T9QWq3xm9is)
+
+
+## Unique Username upon creating account (Brett)
+
+Ensure that the user is using a unique username (lots of u's in that sentence) when they create their timagochi
+
+Super straightforward, just making sure that each username upon creating an account is unique to all past users, thus removing the necessity for a password and additional verification.
+
+See the video in the drive
+
+![Unique Username](https://youtu.be/dfgxJyFH_9M)
+
+Also here^^
+
+
+
+
+<!--?prettify?--></LOOP_PERIOD>
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'medium'};</script>
+<!-- Markdeep: --><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
