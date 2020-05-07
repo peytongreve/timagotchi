@@ -18,6 +18,7 @@
 #define PSET 10
 #define MIDTERM 11
 #define INFINITE 30
+#define SCORES 40
 
 class VerticalMenu
 {

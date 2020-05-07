@@ -27,9 +27,9 @@ char passw[] = "yekumba20!"; //passw for WiFi CHANGE!!!
 char hos[] = "756bdc48.ngrok.io";
 
 //Some constants and some resources:
-const int RESPONSE_TIMEOUT = 6000; //ms to wait for response from hos
-const uint16_t OUT_BUFFER_SIZE = 1000; //size of buffer to hold HTTP response
-char response[OUT_BUFFER_SIZE]; //char array buffer to hold HTTP request
+const int RESPONSE_TIMEOUT = 6000; //ms to wait for respon from hos
+const uint16_t OUT_BUFFER_SIZE = 1000; //size of buffer to hold HTTP respon
+char respon[OUT_BUFFER_SIZE]; //char array buffer to hold HTTP request
 
 Initialization::Initialization(TFT_eSPI tftESP) {
   state = START;
@@ -86,10 +86,10 @@ int Initialization::update(int b1_flag, int b2_flag){
         strcat(request, "Content-Type: application/x-www-form-urlencoded\r\n");
         sprintf(request + strlen(request), "Content-Length: %d\r\n\r\n", strlen(thing));
         strcat(request, thing);
-        do_http_request(hos, request, response, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
-        Serial.println(response);
+        do_http_request(hos, request, respon, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
+        Serial.println(respon);
         check = false;
-        if(response[0] == 'f'){
+        if(respon[0] == 'f'){
           state = COURSE;
         }
         draw = true;
@@ -133,8 +133,8 @@ int Initialization::update(int b1_flag, int b2_flag){
         strcat(request, "Content-Type: application/x-www-form-urlencoded\r\n");
         sprintf(request + strlen(request), "Content-Length: %d\r\n\r\n", strlen(thing));
         strcat(request, thing);
-        do_http_request(hos, request, response, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
-        Serial.println(response);
+        do_http_request(hos, request, respon, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
+        Serial.println(respon);
         drawEnd();
         draw = false;
       }
@@ -152,6 +152,10 @@ int Initialization::update(int b1_flag, int b2_flag){
       break;
   }
   return flag;
+}
+
+char* Initialization::getUsername(){
+  return init_username;
 }
 
 void Initialization::drawStart(){
@@ -248,36 +252,36 @@ uint8_t Initialization::char_append(char* buff, char c, uint16_t buff_size) {
    Arguments:
       char* hos: null-terminated char-array containing hos to connect to
       char* request: null-terminated char-arry containing properly formatted HTTP request
-      char* response: char-array used as output for function to contain response
-      uint16_t response_size: size of response buffer (in bytes)
-      uint16_t response_timeout: duration we'll wait (in ms) for a response from server
+      char* respon: char-array used as output for function to contain respon
+      uint16_t respon_size: size of respon buffer (in bytes)
+      uint16_t respon_timeout: duration we'll wait (in ms) for a respon from server
       uint8_t serial: used for printing debug information to terminal (true prints, false doesn't)
    Return value:
       void (none)
 */
-void Initialization::do_http_request(char* hos, char* request, char* response, uint16_t response_size, uint16_t response_timeout, uint8_t serial) {
+void Initialization::do_http_request(char* hos, char* request, char* respon, uint16_t respon_size, uint16_t respon_timeout, uint8_t serial) {
   WiFiClient client; //instantiate a client object
   if (client.connect(hos, 80)) { //try to connect to hos on port 80
     if (serial) Serial.print(request);//Can do one-line if statements in C without curly braces
     Serial.println("\n\n");
     client.print(request);
-    memset(response, 0, response_size); //Null out (0 is the value of the null terminator '\0') entire buffer
+    memset(respon, 0, respon_size); //Null out (0 is the value of the null terminator '\0') entire buffer
     uint32_t count = millis();
     while (client.connected()) { //while we remain connected read out data coming back
-      client.readBytesUntil('\n', response, response_size);
-      if (serial) Serial.println(response);
-      if (strcmp(response, "\r") == 0) { //found a blank line!
+      client.readBytesUntil('\n', respon, respon_size);
+      if (serial) Serial.println(respon);
+      if (strcmp(respon, "\r") == 0) { //found a blank line!
         break;
       }
-      memset(response, 0, response_size);
-      if (millis() - count > response_timeout) break;
+      memset(respon, 0, respon_size);
+      if (millis() - count > respon_timeout) break;
     }
-    memset(response, 0, response_size);
+    memset(respon, 0, respon_size);
     count = millis();
-    while (client.available()) { //read out remaining text (body of response)
-      char_append(response, client.read(), OUT_BUFFER_SIZE);
+    while (client.available()) { //read out remaining text (body of respon)
+      char_append(respon, client.read(), OUT_BUFFER_SIZE);
     }
-    if (serial) Serial.println(response);
+    if (serial) Serial.println(respon);
     client.stop();
     if (serial) Serial.println("-----------");
   } else {

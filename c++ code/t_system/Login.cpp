@@ -115,6 +115,10 @@ int Login::update(int b1_delta, int b2_delta) {
   return flag;
 }
 
+char* Login::getUsername(){
+  return login_username;
+}
+
 void Login::drawStart(){
   tft.fillScreen(TFT_WHITE);
   tft.setTextColor(TFT_BLACK);

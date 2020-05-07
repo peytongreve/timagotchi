@@ -8,6 +8,11 @@
 #include <mpu6050_esp32.h>
 #include <time.h>
 
+char ho[] = "756bdc48.ngrok.io";
+const int RESPONSE_TIMEOUT = 6000; //ms to wait for respons from hos
+const uint16_t OUT_BUFFER_SIZE = 1000; //size of buffer to hold HTTP respons
+char respons[OUT_BUFFER_SIZE]; //char array buffer to hold HTTP request
+
 InfiniteRun::InfiniteRun(TFT_eSPI tftESP, char* user, char* wifi, char* password, MPU6050 imu_arg) {
     state = 0;
     username = user;
@@ -143,5 +148,77 @@ bool InfiniteRun::checkForCollision() {
 }
 
 void InfiniteRun::postScore() {
-    // post the `highest_score` to server for `username`
+    char thing[30];
+    sprintf(thing, "name=%s&score=%d", username, current_score);
+    char request[500];
+    sprintf(request, "POST /infinite_run? HTTP/1.1\r\n");
+    sprintf(request + strlen(request), "Host: %s\r\n", ho);
+    strcat(request, "Content-Type: application/x-www-form-urlencoded\r\n");
+    sprintf(request + strlen(request), "Content-Length: %d\r\n\r\n", strlen(thing));
+    strcat(request, thing);
+    do_http_request(ho, request, respons, OUT_BUFFER_SIZE, RESPONSE_TIMEOUT, true);
+    Serial.println(respons);
+}
+
+
+/*----------------------------------
+  char_append Function:
+  Arguments:
+     char* buff: pointer to character array which we will append a
+     char c:
+     uint16_t buff_size: size of buffer buff
+
+  Return value:
+     boolean: True if character appended, False if not appended (indicating buffer full)
+*/
+uint8_t InfiniteRun::char_append(char* buff, char c, uint16_t buff_size) {
+  int len = strlen(buff);
+  if (len > buff_size) return false;
+  buff[len] = c;
+  buff[len + 1] = '\0';
+  return true;
+}
+
+/*----------------------------------
+   do_http_request Function:
+   Arguments:
+      char* hos: null-terminated char-array containing hos to connect to
+      char* request: null-terminated char-arry containing properly formatted HTTP request
+      char* respons: char-array used as output for function to contain respons
+      uint16_t respons_size: size of respons buffer (in bytes)
+      uint16_t respons_timeout: duration we'll wait (in ms) for a respons from server
+      uint8_t serial: used for printing debug information to terminal (true prints, false doesn't)
+   Return value:
+      void (none)
+*/
+void InfiniteRun::do_http_request(char* hos, char* request, char* respons, uint16_t respons_size, uint16_t respons_timeout, uint8_t serial) {
+  WiFiClient client; //instantiate a client object
+  if (client.connect(hos, 80)) { //try to connect to hos on port 80
+    if (serial) Serial.print(request);//Can do one-line if statements in C without curly braces
+    Serial.println("\n\n");
+    client.print(request);
+    memset(respons, 0, respons_size); //Null out (0 is the value of the null terminator '\0') entire buffer
+    uint32_t count = millis();
+    while (client.connected()) { //while we remain connected read out data coming back
+      client.readBytesUntil('\n', respons, respons_size);
+      if (serial) Serial.println(respons);
+      if (strcmp(respons, "\r") == 0) { //found a blank line!
+        break;
+      }
+      memset(respons, 0, respons_size);
+      if (millis() - count > respons_timeout) break;
+    }
+    memset(respons, 0, respons_size);
+    count = millis();
+    while (client.available()) { //read out remaining text (body of respons)
+      char_append(respons, client.read(), OUT_BUFFER_SIZE);
+    }
+    if (serial) Serial.println(respons);
+    client.stop();
+    if (serial) Serial.println("-----------");
+  } else {
+    if (serial) Serial.println("connection failed :/");
+    if (serial) Serial.println("wait 0.5 sec...");
+    client.stop();
+  }
 }

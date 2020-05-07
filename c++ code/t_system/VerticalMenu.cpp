@@ -86,6 +86,9 @@ int VerticalMenu::update(int b1_delta, int b2_delta) {
         if (selected == 1) {
           flag = INFINITE;
         }
+        if(selected == 3){
+          flag = SCORES;
+        }
       } else if (b1_delta == -3) {
         state = HOME;
         eraseCursor();
@@ -110,6 +113,7 @@ int VerticalMenu::update(int b1_delta, int b2_delta) {
   return flag;
 }
 void VerticalMenu::displayHome() {
+  state = HOME;
   num_items = 4;
   tft.fillScreen(TFT_WHITE);
   drawNewBeaver();
