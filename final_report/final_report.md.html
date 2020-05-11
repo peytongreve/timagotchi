@@ -1,0 +1,128 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+**Timagotchi**
+
+2-3 sentence summary
+
+Overview
+=================================================================
+
+[describe in detail what a timagotchi does]
+
+
+Parts
+==================================================================
+
+
+
+
+Accounts
+=================================================================
+
+Creating a Timagotchi
+-----------------------------------------------------------------
+
+
+
+Logging in
+------------------------------------------------------------------
+
+Similar to the initialization class for the Timagotchi creation, the login class simply gets user input for a username and checks whether or not it exists in the database.
+
+The key differences in the login page are in its accessibility and UX:
+
+* Two-way scrolling keyboard: Simply put, the user can scroll left or right through the alphabet using single left or right button presses. Additionally, the user can see the next and previous letter, since the alphabet can be hard sometimes
+* Error Screen: if the username isn’t found, the user is given a prompt asking if they’d like to try again
+* Clear: The user can clear the username that they just typed by double clicking the left button.
+* Exit: The user can, at any time, return to the starting “Welcome” page by long pressing the left button.
+
+While these features might not even deserve all this attention, they’re important since they take user tendencies into account, which is very important since this is the system’s bottleneck; every user has to sign in. 
+
+![Login](https://youtu.be/T9QWq3xm9is)
+
+
+
+
+Games
+===================================================================
+
+Single Player Trivia
+-------------------------------------------------------------------
+
+Single Player Trivia parses the a response from the open trivia database (https://opentdb.com/api_config.php) using a python proxy endpoint, and sends down a string containing the question, the options, and the answer. We display the question at the top followed by the answer choices. If the player chooses the correct answer a green box will highlight around the answer. The player can keep playing or long press to exit.
+
+While we utilized a display strategy similar to that of the VerticalMenu class, this one had to accommodate for more text and answer feedback
+	* We had to use print statements instead of drawing strings to allow for overflow
+	* we changed the margins of the cursors
+	* most significantly, we added a buzzer function, where once a user selects an answer, the selected answer and the right answer are the only answers shown on the screen:
+		* if the user is right, only their selected answer is shown with a green cursor.
+		* if the user is wrong, their selected answer remains, with the red cursor, and the correct answer remains, with a green cursor.
+
+![Trivia State Diagram](SPTriviaStateDiagram.jpg)
+
+Multiplayer Trivia
+---------------------------------------------------------------------
+
+
+
+
+Infinite Run
+--------------------------------------------------------------------
+
+
+
+Server
+====================================================================
+
+![Endpoints](endpoints.jpeg)
+
+
+System Architecture
+=====================================================================
+
+Object Oriented FSM
+---------------------------------------------------------------------
+
+![System Diagram](system_diagram1.png)
+
+
+Cool Button 
+---------------------------------------------------------------------
+
+The Cool Button is an upgraded version of the Nice Button, with short and long presses, that we made in an exercise. produces four different kinds of outputs on every update, which in the diagram are called ‘flags’. These represents what kind of press the user has done with the button: 
+
+* Flag = 0: no press
+* Flag = 1: short press
+* Flag = 2: long press
+* Flag = 3: double click
+
+When used in any process, the flags output by the button are meant to be kept track of, and in every cycle, the current flag should be compared to the old flag; the difference between them determines the button delta, which, when not equal to zero, indicates that something (depending on the integrated system) should happen. Below is the state diagram
+
+![Vertical Menu](CoolButtonDiagram.png)
+
+
+Menu
+---------------------------------------------------------------------
+
+This is the main vertical menu for the Timagotchi device. The user can toggle between different options using right button short clicks, select items using right button double clicks, and go back to the previous menu using left button double clicks. 
+
+![Vertical Menu](https://www.youtube.com/watch?v=K4gU4emfEPU&list=UUAddou6GGFJpgP2T2pp52XA)
+
+
+Icons
+---------------------------------------------------------------------
+
+
+
+Challenges
+======================================================================
+
+
+Team
+======================================================================
+
+Julian Manyika, Peyton Greve, Kyle Sandell, Brett Allen, Alex Cho and Haran Nadarajah
+
+
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js" charset="utf-8"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
