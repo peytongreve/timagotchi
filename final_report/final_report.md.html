@@ -2,8 +2,6 @@
 
 **Timagotchi**
 
-2-3 sentence summary
-
 Video Demonstration
 ==================================================================
 
@@ -19,7 +17,17 @@ The Timagotchi is "pet" that we made to simulate the lives of us at MIT. We miss
 Parts
 ==================================================================
 
+* The ESP32 Dev Board (your microcontroller)
+* The TFT Display
+* 3 breadboards
+* An acryllic back piece
+* A USB-A to micro USB cable
+* Two button switches
+* Inertial Measurement Unit (IMU chip)
 
+Below is an image of the wiring (there's some extra wires in there due to there having been more sensors than necessary):
+
+![Wiring](wiring.png)
 
 
 Accounts
@@ -141,6 +149,22 @@ Icons
 Challenges
 ======================================================================
 One major challenge was working with buffers in the Trivia game project and getting errors filling the buffers with the information we wanted. As soon as we got some funcitonality with that the API we were using was disabled which was another obstacle.
+
+Another challenge was the open trivia api shutting down temporarily. At the time of writing, the api has been down for about a week, and all our trivia depends on the api. It seems as though the lesson here is that it's always risky to depend on a completely separate system for your product to operate at full capacity since you have no control.
+
+The biggest challenge was that this project was very ambitious. However, this could be seen as a positive, since there are so many opportunities to add more and more to the Timagotchi environment. Below is are our intial ideas for what would be in the project:
+
+"Taking inspiration from the [Tamagotchi](https://en.wikipedia.org/wiki/Tamagotchi), the *Timagotchi* is a multiplayer game that allows the user to 
+get a somewhat parodied taste of student life at MIT. To enroll in the virtual MIT of Timagotchis, the user sets up their Timagotchi, giving it a name, major, and extracurricular. 
+Once adMITted, the user must make sure to control their Tim’s class schedule, feed it, and help it get through each semester. 
+A Timagatchi’s time variant attributes include happiness, hunger, GPA, and money. 
+Including the initial user input information, there are other actions that can affect its state: class schedule, UROPs, meals, and mini-game performance. 
+The mini-games are ways for the user to contribute to their Timagotchi’s GPA, which will help them advance at MIT. 
+Additionally, Timagotchis interact with one another and can help each other. Though not intended to accurately represent every MIT experience, 
+the goal of the game is to simulate school/life balance, encourage social collaboration, get through a virtual MIT experience, and have fun!"
+
+We unfortunately missed out on implementing a couple cool extra ideas, such as a voice recognition sign-in, a career fair related game, an email game, and more satirical MIT-related features.
+
 
 Team
 ======================================================================
