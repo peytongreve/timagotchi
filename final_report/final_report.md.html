@@ -71,8 +71,8 @@ By the project deadline the Trivia API (from the Trivia Design Project) we were 
 Multiplayer Trivia
 ---------------------------------------------------------------------
 
-Multiplayer Trivia 
 
+Using a similar scoring mechanism with global leaderboard as discussed more in infinite run, we had designed multiplayer trivia to work virtually the same as Single Player trivia, with global score tracking. Upon correct or incorrect responses, users scores were to be updated, and their scores tracked in a global database so users could track a leaderboard. However, with the trivia API being taken down, we decided it would not add value to our project to have a multiplayer trivia game over a small set of hard coded trivia questions. 
 
 
 Infinite Run
@@ -92,8 +92,8 @@ This is shown in the following video:
 Server
 ====================================================================
 
-![Endpoints](endpoints.jpeg)
-
+![Endpoints](endpointsfinal.png)
+For our server, we chose to use Django to power the backend. We chose this so that we could divide up our server across multiple endpoints more easily, as well as easily manage the database, since we have access to the `sqlite3` command line interface on our local machines. Using Django Rest Framework alongside Django, we were able to implement the server with various different endpoints as shown above. The code can be found in the `backend` folder, and the python requirements can be installed with `pip install -r requirements.txt`. Currently, we run the server locally and use `ngrok` to create an endpoint that is globally accessibe, which allowed us to work around having to use AWS or any other hosting architecture. 
 
 System Architecture
 =====================================================================
