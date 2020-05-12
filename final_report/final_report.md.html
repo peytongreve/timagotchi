@@ -117,6 +117,102 @@ Object Oriented FSM
 
 ![System Diagram](system_diagram1.png)
 
+Below is our system fsm code. We made different states that allowed us to use different classes/objects, allowing us the further distribute the code among many different files and turn our features into individual objects. In each state, the sensor input (buttons and the imu in the case of infinite run) determine updates in the object in that moment, which returned a nonzero flag when it was time to switch to a different state and different object.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void fsm(int b1_delta, int b2_delta) {
+	switch (state) {
+	  case LANDING:
+		if (b1_delta == -1) {
+		  state = LOGIN;
+		} else if (b2_delta == -1) {
+		  state = INIT;
+		}
+		break;
+	  case LOGIN:
+		flag = login.update(b1_delta, b2_delta);
+		if (flag == 1) {
+		  state = NAV;
+		  menu.displayHome();
+		  username = login.getUsername();
+		} else if (flag == 2) {
+		  state = LANDING;
+		  drawLandingScreen();
+		}
+		break;
+	  case INIT:
+		flag = timCreator.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  username = timCreator.getUsername();
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case NAV:
+		flag = menu.update(b1_delta, b2_delta);
+		if (flag == single_trivia_flag) {
+		  state = SP_TRIVIA;
+		  Serial.println("Problem?");
+		  sp_trivia.initialize(username, network, password, tft, false);
+		} else if (flag == multi_trivia_flag) {
+		  state = MP_TRIVIA;
+		  //trivia = TriviaGame(multi);
+		} else if (flag == infinite_run_flag) {
+		  state = INFINITE;
+		  imu_activated = true;
+		  tft.fillScreen(TFT_WHITE);
+		  infinite = InfiniteRun(tft, username, network, password, imu);
+		  infinite.step(10);
+		} else if (flag == scores_flag) {
+		  state = SCORES;
+		  drawScoresBool = true;
+		}
+		break;
+	  case SP_TRIVIA:
+		flag = sp_trivia.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case MP_TRIVIA:
+		//flag = mp_trivia.update(b1_delta, b2_delta);
+		if (flag != 0) {
+		  state = NAV;
+		  menu.displayHome();
+		}
+		break;
+	  case INFINITE:
+		flag = 0;
+		imu.readAccelData(imu.accelCount);
+		infinite.step(float(-imu.accelCount[1] * imu.aRes) * 10);
+		if (flag != 0 or b1_delta != 0) {
+		  state = NAV;
+		  imu_activated = false;
+		  menu.displayHome();
+		}
+		break;
+	  case SCORES:
+		flag = 0;
+		if(drawScoresBool){
+		  drawScores();
+		  drawScoresBool = false;
+		}
+		if (flag != 0 or b1_delta != 0) {
+		  state = NAV;
+		  imu_activated = false;
+		  menu.displayHome();
+		}
+		break;
+	}
+	if (flag != 0) {
+	  Serial.println(flag);
+	}
+	flag = 0;
+  }
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 Cool Button 
 ---------------------------------------------------------------------
