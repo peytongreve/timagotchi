@@ -239,7 +239,9 @@ This is the main vertical menu for the Timagotchi device. The user can toggle be
 
 Icons
 ---------------------------------------------------------------------
+Icons were only able to be transferred onto the screen if they were black and white images. In order to do so, the images had to be downloaded, transferred to photoshop and retraced with only black pixels on a white background. After doing so, the image had to be exported as .bmp file. This was necessary because we had to convert the BMP file into a char array of pixel values through an online converter. It was crucial that the image was the exact pixel size desired ont he screen because the arrays were not able to be scaled. This was a bit of a hastle as if we desried different scaled images we had to scaled them in photoshop and reconvert. 
 
+After doing so, we moved all of the char arrays into the code and used a drawBitmap function to display it onto the screen. The initial beaver took lots of effort to get right, but after the first 4 or 5 images, we began to get the process of it. The conversion was not always successful as there were not enough pixels to draw smaller lines. This resulted int he use of simpler and clearer icons with less minute details which actually gave each menu a cleaner look as a whole.
 
 
 Challenges
